@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebService", "WebService\WebService.csproj", "{C7CA504C-BAD3-43A5-A3C2-D793EA0F982F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repositories", "Repositories\Repositories.csproj", "{DBE93560-CAD1-478D-9353-B494A30A0314}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{C7CA504C-BAD3-43A5-A3C2-D793EA0F982F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7CA504C-BAD3-43A5-A3C2-D793EA0F982F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7CA504C-BAD3-43A5-A3C2-D793EA0F982F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBE93560-CAD1-478D-9353-B494A30A0314}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBE93560-CAD1-478D-9353-B494A30A0314}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBE93560-CAD1-478D-9353-B494A30A0314}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBE93560-CAD1-478D-9353-B494A30A0314}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
