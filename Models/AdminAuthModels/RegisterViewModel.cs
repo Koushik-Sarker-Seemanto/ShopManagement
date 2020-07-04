@@ -14,6 +14,7 @@ namespace Models.AdminAuthModels
         public string Address { get; set; }
         [Required]
         public string Password { get; set; }
+        [Required]
         public Roles Role { get; set; }
         public bool Active { get; set; }
         public string AuthorSecret { get; set; }

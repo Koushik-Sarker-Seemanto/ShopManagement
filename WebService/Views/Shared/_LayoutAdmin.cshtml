@@ -6,8 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <meta name="description" content="" />
     <meta name="author" content="PaidPiper" />
-    @*<meta name="viewport" content="width=device-width, initial-scale=1.0" />*@
-    @*<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />*@
     <title>@ViewData["Title"] - Admin</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     @*<link rel="stylesheet" href="~/css/site.css" />*@
@@ -95,9 +93,9 @@
                             </nav>
                         </div>
                         <div class="sb-sidenav-menu-heading">Addons</div>
-                        <a class="nav-link" href="#">
-                            <div class="sb-nav-link-icon"><i class="fas fa-chart-area"></i></div>
-                            Charts
+                        <a class="nav-link" href="@Url.Action("AddEmployee", "AdminPanel")">
+                            <div class="sb-nav-link-icon"><i class="fas fa-plus-circle"></i></div>
+                            Add Employee
                         </a>
                         <a class="nav-link" href="#">
                             <div class="sb-nav-link-icon"><i class="fas fa-table"></i></div>
@@ -121,7 +119,7 @@
             <footer class="py-4 bg-light">
                 <div class="container-fluid">
                     <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Your Website 2020</div>
+                        <div class="text-muted">Copyright &copy; PaidPiper 2020</div>
                         <div>
                             <a href="#">Privacy Policy</a>
                             &middot;
@@ -136,6 +134,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     @*<script src="~/js/site.js" asp-append-version="true"></script>*@
     <script src="~/Admin/js/scripts.js"></script>
+    <script src="~/Admin/js/admin-scripts.js"></script>
     @RenderSection("Scripts", required: false)
 <style>
     .footer {
@@ -146,5 +145,6 @@
       line-height: 60px; /* Vertically center the text there */
     }
 </style>
+
 </body>
 </html>

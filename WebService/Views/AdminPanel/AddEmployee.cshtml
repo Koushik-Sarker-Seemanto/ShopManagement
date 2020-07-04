@@ -1,0 +1,80 @@
+@model Models.AdminAuthModels.RegisterViewModel
+@{
+    ViewData["Title"] = "Add Manager";
+    Layout = "_LayoutAdmin";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                <div class="card-header"><h3 class="text-center font-weight-light my-4">Add Employee</h3></div>
+                <div class="card-body">
+                    @Html.ValidationSummary(true, "", new {@class = "text-danger alert alert-danger"})
+                    <form id="addEmployeeForm" asp-action="AddEmployee" class="" autocomplete="off">
+                        @Html.AntiForgeryToken()
+                        <div class="form-group">
+                            <label class="small mb-1" for="username">Username</label>
+                            <input asp-for="Username" class="form-control py-4" id="username" type="text" placeholder="Enter Username (Unique)">
+                            <span asp-validation-for="Username" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="small mb-1" for="name">Name</label>
+                            <input asp-for="Name" class="form-control py-4" id="name" type="text" placeholder="Enter Name">
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="small mb-1" for="phoneNo">Phone Number</label>
+                                    <input asp-for="PhoneNo" class="form-control py-4" id="phoneNo" type="text" placeholder="Enter Phone No">
+                                    <span asp-validation-for="PhoneNo" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="small mb-1" for="email">Email</label>
+                                    <input asp-for="Email" class="form-control py-4" id="email" type="email" aria-describedby="emailHelp" placeholder="Enter email address">
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="small mb-1" for="address">Address</label>
+                            <textarea asp-for="Address" class="form-control py-4" id="address" type="text" placeholder="Enter Address"></textarea>
+                            <span asp-validation-for="Address" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="small mb-1" for="role">Role</label>
+                            <select asp-for="Role" class="form-control py--4" id="role">
+                                <option disabled selected value=""> -- Please Select -- </option>
+                                <option value="Manager">Manager</option>
+                                <option value="Seller">Seller</option>
+                            </select>
+                            <span asp-validation-for="Role" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="small mb-1" for="password">Password</label>
+                                    <input asp-for="Password" class="form-control py-4" id="password" type="password" placeholder="Enter password">
+                                    <span asp-validation-for="Password" class="passwordError text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label class="small mb-1" for="confirmPassword">Confirm Password</label>
+                                    <input class="form-control py-4" id="confirmPassword" type="password" placeholder="Confirm password">
+                                    <span class="passwordError text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group mt-4 mb-0"><button type="submit" class="btn btn-primary btn-block">Create Employee</button></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
