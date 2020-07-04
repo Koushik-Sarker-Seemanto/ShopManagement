@@ -39,8 +39,14 @@ namespace WebService.Controllers
             return RedirectToAction("Login", "AdminAuth");
         }
 
-        public IActionResult Register()
+        public async Task<IActionResult> Register()
         {
+            var authenticationInfo = await HttpContext.AuthenticateAsync();
+
+            if(authenticationInfo != null && authenticationInfo.Succeeded)
+            {
+                return RedirectToAction("Login", "AdminAuth");
+            }
             return View();
         }
         
@@ -69,6 +75,7 @@ namespace WebService.Controllers
             return View(model);
         }
         
+        [Route("/login")]
         public async Task<IActionResult> Login()
         {
             var authenticationInfo = await HttpContext.AuthenticateAsync();
@@ -78,17 +85,17 @@ namespace WebService.Controllers
                 var role = authenticationInfo.Principal.Claims.FirstOrDefault(e => e.Type == "Role");
                 if(role?.Value == Roles.Admin.ToString())
                 {
-                    return RedirectToAction("AuthorizedAdmin", "AdminAuth");
+                    return RedirectToAction("Index", "AdminPanel");
                 }
 
                 if (role?.Value == Roles.Manager.ToString())
                 {
-                    return RedirectToAction("AuthorizedManager", "AdminAuth");
+                    return RedirectToAction("Index", "ManagerPanel");
                 }
                 
                 if (role?.Value == Roles.Seller.ToString())
                 {
-                    return RedirectToAction("AuthorizedSeller", "AdminAuth");
+                    return RedirectToAction("Index", "SellerPanel");
                 }
 
                 return View();
@@ -96,6 +103,7 @@ namespace WebService.Controllers
             return View();
         }
 
+        [Route("/login")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login([Bind] LoginViewModel model)
@@ -123,31 +131,15 @@ namespace WebService.Controllers
             switch (user.Role)
             {
                 case Roles.Admin:
-                    return RedirectToAction("AuthorizedAdmin", "AdminAuth");
+                    return RedirectToAction("Index", "AdminPanel");
                 case Roles.Manager:
-                    return RedirectToAction("AuthorizedManager", "AdminAuth");
+                    return RedirectToAction("Index", "ManagerPanel");
                 case Roles.Seller:
-                    return RedirectToAction("AuthorizedSeller", "AdminAuth");
+                    return RedirectToAction("Index", "SellerPanel");
                 default:
-                    return View();
+                    ModelState.AddModelError("", "Invalid Login!");
+                    return View(model);
             }
-        }
-
-        [Authorize(Policy = "Admin")]
-        public IActionResult AuthorizedAdmin()
-        {
-            return View();
-        }
-        
-        [Authorize(Policy = "Manager")]
-        public IActionResult AuthorizedManager()
-        {
-            return View();
-        }
-        [Authorize(Policy = "Seller")]
-        public IActionResult AuthorizedSeller()
-        {
-            return View();
         }
 
         public IActionResult UnauthorizedPage()
@@ -155,6 +147,7 @@ namespace WebService.Controllers
             return View();
         }
 
+        [Route("/logout")]
         [Authorize]
         public async Task<IActionResult> Logout()
         {
