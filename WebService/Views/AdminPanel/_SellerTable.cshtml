@@ -1,0 +1,63 @@
+@model Models.ViewModels.AdminPanel.IndexViewModel;
+
+<div class="card mb-4">
+    <div class="card-header">
+        <i class="fas fa-table mr-1"></i>
+        Seller Table
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="sellerDataTable" width="100%" cellspacing="0">
+                <thead> 
+                <tr class="text-center">
+                    <th>Name</th>
+                    <th>Phone No</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th>Action Link</th>
+                </tr>  
+                </thead>
+                <tbody>
+                @foreach (var item in Model.Sellers)
+                {
+                    <tr class="text-center">
+                        @if (item.Name != null)
+                        {
+                            <td>@item.Name</td>
+                        }
+                        else
+                        {
+                            <td>N/A</td>
+                        }
+                        @if (item.PhoneNo != null)
+                        {
+                            <td>@item.PhoneNo</td>
+                        }
+                        else
+                        {
+                            <td>N/A</td>
+                        }
+                        @if (item.Email != null)
+                        {
+                            <td>@item.Email</td>
+                        }
+                        else
+                        {
+                            <td>N/A</td>
+                        }
+                        @if (item.Address != null)
+                        {
+                            <td>@item.Address</td>
+                        }
+                        else
+                        {
+                            <td>N/A</td>
+                        }
+                        <td>@Html.ActionLink("Details", "Index", "AdminPanel", new {id = item.Id}, new {@class = "btn btn-primary"})</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>  
+</div>

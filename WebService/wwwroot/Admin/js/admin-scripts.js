@@ -25,5 +25,11 @@
         $(".passwordError").text("");
         $("#confirmPassword").css("border", "");
     });
+
+
+    $(document).ready(function() {
+        $('#managerDataTable').DataTable();
+        $('#sellerDataTable').DataTable();
+    });
     
 })(jQuery);
