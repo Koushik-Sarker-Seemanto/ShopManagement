@@ -1,11 +1,12 @@
 @model Models.ViewModels.AdminPanel.IndexViewModel;
 
 <div class="card mb-4">
-    <div class="card-header">
+    <div class="card-header" id="seller-table-header" style="cursor: pointer">
         <i class="fas fa-table mr-1"></i>
         Seller Table
+        <i class="fas fa-caret-down float-right"></i>
     </div>
-    <div class="card-body">
+    <div class="card-body" id="seller-table-body">
         <div class="table-responsive">
             <table class="table table-bordered" id="sellerDataTable" width="100%" cellspacing="0">
                 <thead> 

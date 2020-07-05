@@ -32,4 +32,11 @@
         $('#sellerDataTable').DataTable();
     });
     
+    $("#manager-table-header").click(function () {
+        $("#manager-table-body").fadeToggle(500);
+    });
+    $("#seller-table-header").click(function () {
+        $("#seller-table-body").fadeToggle(500);
+    });
+    
 })(jQuery);
