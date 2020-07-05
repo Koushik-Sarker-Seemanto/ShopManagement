@@ -1,3 +1,10 @@
+
+@using System.Security.Claims
+
+@{
+    var currentUser = ((ClaimsIdentity) User.Identity).FindFirst(ClaimTypes.Name).Value;
+}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +17,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     @*<link rel="stylesheet" href="~/css/site.css" />*@
     <link rel="stylesheet" href="~/Admin/css/styles.css" />
+    <link rel="stylesheet" href="~/Admin/css/admin-style.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css" />
     
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -54,50 +62,7 @@
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                             Dashboard
                         </a>
-                        <div class="sb-sidenav-menu-heading">Interface</div>
-                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
-                            <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                            Layouts
-                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                        </a>
-                        <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-parent="#sidenavAccordion">
-                            <nav class="sb-sidenav-menu-nested nav">
-                                <a class="nav-link" href="#">Static Navigation</a>
-                                <a class="nav-link" href="#">Light Sidenav</a>
-                            </nav>
-                        </div>
-                        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePages" aria-expanded="false" aria-controls="collapsePages">
-                            <div class="sb-nav-link-icon"><i class="fas fa-book-open"></i></div>
-                            Pages
-                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                        </a>
-                        <div class="collapse" id="collapsePages" aria-labelledby="headingTwo" data-parent="#sidenavAccordion">
-                            <nav class="sb-sidenav-menu-nested nav accordion" id="sidenavAccordionPages">
-                                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#pagesCollapseAuth" aria-expanded="false" aria-controls="pagesCollapseAuth">
-                                    Authentication
-                                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                                </a>
-                                <div class="collapse" id="pagesCollapseAuth" aria-labelledby="headingOne" data-parent="#sidenavAccordionPages">
-                                    <nav class="sb-sidenav-menu-nested nav">
-                                        <a class="nav-link" href="@Url.Action("Login", "AdminAuth")">Login</a>
-                                        <a class="nav-link" href="register.html">Register</a>
-                                        <a class="nav-link" href="password.html">Forgot Password</a>
-                                    </nav>
-                                </div>
-                                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#pagesCollapseError" aria-expanded="false" aria-controls="pagesCollapseError">
-                                    Error
-                                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                                </a>
-                                <div class="collapse" id="pagesCollapseError" aria-labelledby="headingOne" data-parent="#sidenavAccordionPages">
-                                    <nav class="sb-sidenav-menu-nested nav">
-                                        <a class="nav-link" href="401.html">401 Page</a>
-                                        <a class="nav-link" href="404.html">404 Page</a>
-                                        <a class="nav-link" href="500.html">500 Page</a>
-                                    </nav>
-                                </div>
-                            </nav>
-                        </div>
-                        <div class="sb-sidenav-menu-heading">Addons</div>
+                        @*<div class="sb-sidenav-menu-heading">Addons</div>*@
                         <a class="nav-link" href="@Url.Action("AddEmployee", "AdminPanel")">
                             <div class="sb-nav-link-icon"><i class="fas fa-plus-circle"></i></div>
                             Add Employee
@@ -110,7 +75,14 @@
                 </div>
                 <div class="sb-sidenav-footer">
                     <div class="small">Logged in as:</div>
-                    Username
+                    @if (currentUser != null)
+                    {
+                        <p>@currentUser</p>
+                    }
+                    else
+                    {
+                        <p>UserNotFound</p>
+                    }
                 </div>
             </nav>
         </div>
@@ -138,49 +110,5 @@
 <script src="~/Admin/js/scripts.js"></script>
     <script src="~/Admin/js/admin-scripts.js"></script>
     @RenderSection("Scripts", required: false)
-<style>
-    .footer {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      white-space: nowrap;
-      line-height: 60px; /* Vertically center the text there */
-    }
-    .customBtn-admin-primary {
-    	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #8e969e), color-stop(1, #343a40));
-    	background:-moz-linear-gradient(top, #8e969e 5%, #343a40 100%);
-    	background:-webkit-linear-gradient(top, #8e969e 5%, #343a40 100%);
-    	background:-o-linear-gradient(top, #8e969e 5%, #343a40 100%);
-    	background:-ms-linear-gradient(top, #8e969e 5%, #343a40 100%);
-    	background:linear-gradient(to bottom, #8e969e 5%, #343a40 100%);
-    	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#8e969e', endColorstr='#343a40',GradientType=0);
-    	background-color:#8e969e;
-    	display:inline-block;
-    	cursor:pointer;
-    	color:#ffffff;
-    	font-family:Arial;
-    	font-size:16px;
-    	font-weight:bold;
-    	padding: 10px 10%;
-    	text-decoration:none;
-    }
-    .customBtn-admin-primary:hover {
-    	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #343a40), color-stop(1, #8e969e));
-    	background:-moz-linear-gradient(top, #343a40 5%, #8e969e 100%);
-    	background:-webkit-linear-gradient(top, #343a40 5%, #8e969e 100%);
-    	background:-o-linear-gradient(top, #343a40 5%, #8e969e 100%);
-    	background:-ms-linear-gradient(top, #343a40 5%, #8e969e 100%);
-    	background:linear-gradient(to bottom, #343a40 5%, #8e969e 100%);
-    	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#343a40', endColorstr='#8e969e',GradientType=0);
-    	background-color:#343a40;
-    }
-    .customBtn-admin-primary:active {
-    	position:relative;
-    	top:1px;
-    }
-
-
-</style>
-
 </body>
 </html>
