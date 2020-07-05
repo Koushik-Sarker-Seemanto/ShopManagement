@@ -27,6 +27,16 @@ namespace WebService.Controllers
             return View(indexViewModel);
         }
 
+        public async Task<IActionResult> EmployeeDetails(string id)
+        {
+            if (id == null)
+            {
+                return RedirectToAction("Error", "Home");
+            }
+            var viewModel = await _adminPanelService.GetEmployeeDetails(id);
+            return View(viewModel);
+        }
+
         public IActionResult AddEmployee()
         {
             return View();

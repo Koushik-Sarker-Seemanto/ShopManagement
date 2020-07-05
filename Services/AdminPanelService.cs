@@ -39,7 +39,29 @@ namespace Services
                 return null;
             }
         }
-        
+
+        public async Task<EmployeeDetailsViewModel> GetEmployeeDetails(string id)
+        {
+            try
+            {
+                var employee = await _repository.GetItemAsync<User>(e => e.Id == id);
+                if (employee != null)
+                {
+                    employee.Password = null;
+                }
+                EmployeeDetailsViewModel viewModel = new EmployeeDetailsViewModel
+                {
+                    Employee = employee,
+                };
+                return viewModel;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"GetEmployeeDetails Failed {ex.Message}");
+                return null;
+            }
+        }
+
         private async Task<List<User>> GetAllManager()
         {
             try
