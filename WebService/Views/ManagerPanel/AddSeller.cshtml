@@ -1,17 +1,17 @@
 @model Models.AdminAuthModels.RegisterViewModel
 @{
-    ViewData["Title"] = "Add Employee";
-    Layout = "_LayoutAdmin";
+    ViewData["Title"] = "Add Seller";
+    Layout = "_LayoutManager";
 }
 
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-lg-7">
             <div class="card shadow-lg border-0 rounded-lg mt-5">
-                <div class="card-header"><h3 class="text-center font-weight-light my-4">Add Employee</h3></div>
+                <div class="card-header"><h3 class="text-center font-weight-light my-4">Add Seller</h3></div>
                 <div class="card-body">
                     @Html.ValidationSummary(true, "", new {@class = "text-danger alert alert-danger"})
-                    <form id="addEmployeeForm" asp-action="AddEmployee" class="" autocomplete="off">
+                    <form id="addEmployeeForm" asp-action="AddSeller" class="" autocomplete="off">
                         @Html.AntiForgeryToken()
                         <div class="form-group">
                             <label class="small mb-1" for="username">Username</label>
@@ -48,9 +48,7 @@
                         <div class="form-group">
                             <label class="small mb-1" for="role">Role</label>
                             <select asp-for="Role" class="form-control py--4" id="role">
-                                <option disabled selected value=""> -- Please Select -- </option>
-                                <option value="Manager">Manager</option>
-                                <option value="Seller">Seller</option>
+                                <option disabled selected value="Seller"> Seller </option>
                             </select>
                             <span asp-validation-for="Role" class="text-danger"></span>
                         </div>
