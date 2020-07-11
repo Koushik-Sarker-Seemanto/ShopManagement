@@ -12,10 +12,10 @@ namespace WebService.Controllers
     public class ManagerPanelController : Controller
     {
         private IUserServices _userServices;
-        private ILogger<AdminPanelController> logger;
+        private ILogger<ManagerPanelController> logger;
         //private IAdminPanelService _adminPanelService;
 
-        public ManagerPanelController(IUserServices userServices, ILogger<AdminPanelController> logger)
+        public ManagerPanelController(IUserServices userServices, ILogger<ManagerPanelController> logger)
         {
             _userServices = userServices;
             this.logger = logger;
