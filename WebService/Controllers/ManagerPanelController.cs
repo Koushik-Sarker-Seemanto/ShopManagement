@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Models.AdminAuthModels;
+using Models.Entities;
+using Models.ManagerPanelModels;
 using Newtonsoft.Json;
 using Services.Contracts;
 
@@ -13,12 +15,15 @@ namespace WebService.Controllers
     {
         private IUserServices _userServices;
         private ILogger<ManagerPanelController> logger;
+
+        private IManagerPanelService _managerPanelService;
         //private IAdminPanelService _adminPanelService;
 
-        public ManagerPanelController(IUserServices userServices, ILogger<ManagerPanelController> logger)
+        public ManagerPanelController(IUserServices userServices, ILogger<ManagerPanelController> logger, IManagerPanelService managerPanelService)
         {
             _userServices = userServices;
             this.logger = logger;
+            _managerPanelService = managerPanelService;
         }
         // GET
         public IActionResult Index()
@@ -47,6 +52,29 @@ namespace WebService.Controllers
             }
             
             ModelState.AddModelError("", "Invalid Registration");
+            return View(model);
+        }
+
+        public IActionResult AddProduct()
+        {
+            return View();
+        }
+        
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddProduct([Bind] ProductViewModel model)
+        {
+            if(ModelState.IsValid == false)
+            {
+                return View(model);
+            }
+            var result = await _managerPanelService.AddProduct(model);
+            logger.LogInformation($"Product: {JsonConvert.SerializeObject(model)}");
+            if (result != null)
+            {
+                return RedirectToAction("Index", "ManagerPanel");
+            }
+            ModelState.AddModelError("", "Invalid Product");
             return View(model);
         }
     }

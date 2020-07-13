@@ -57,6 +57,7 @@ namespace WebService
             services.AddSingleton<IMongoRepository, MongoRepository>();
             services.AddSingleton<IUserServices, UserServices>();
             services.AddSingleton<IAdminPanelService, AdminPanelService>();
+            services.AddSingleton<IManagerPanelService, ManagerPanelService>();
             
             services.AddControllersWithViews();
         }

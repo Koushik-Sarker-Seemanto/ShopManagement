@@ -62,6 +62,10 @@
                             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                             Dashboard
                         </a>
+                        <a class="nav-link" href="@Url.Action("AddProduct", "ManagerPanel")">
+                            <div class="sb-nav-link-icon"><i class="fas fa-plus-circle"></i></div>
+                            Add Product
+                        </a>
                         @*<div class="sb-sidenav-menu-heading">Addons</div>*@
                         <a class="nav-link" href="@Url.Action("AddSeller", "ManagerPanel")">
                             <div class="sb-nav-link-icon"><i class="fas fa-plus-circle"></i></div>
@@ -72,7 +76,7 @@
                             Tables
                         </a>
                     </div>
-                </div>bg-secondary
+                </div>
                 <div class="sb-sidenav-footer bg-secondary">
                     <div class="small">Logged in as:</div>
                     @if (currentUser != null)
