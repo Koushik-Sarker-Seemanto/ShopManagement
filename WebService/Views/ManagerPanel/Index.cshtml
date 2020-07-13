@@ -3,6 +3,11 @@
     Layout = "_LayoutManager";
 }
 
-<div class="text-center">
-    <h1 class="display-1">Welcome to Manager Index Page!</h1>
-</div>
+<h1 class="mt-4">Dashboard</h1>
+<ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item active">Dashboard</li>
+</ol>
+<h1 class="mt-4">Products</h1>
+@{
+    await Html.RenderPartialAsync("_ProductTable");
+}

@@ -14,6 +14,8 @@ namespace Models.Entities
         public double SellingPrice { get; set; }
         [BsonRequired]
         public double BuyingPrice { get; set; }
+
+        public int Stock { get; set; } = 0;
         public string Details { get; set; }
     }
 }

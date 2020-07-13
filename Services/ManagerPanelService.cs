@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Models.Entities;
@@ -41,6 +43,20 @@ namespace Services
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"AddProduct Failed: {ex.Message}");
+                return null;
+            }
+        }
+
+        public IQueryable<Product> GetAllProducts()
+        {
+            try
+            {
+                var results = _repository.GetItems<Product>();
+                return results;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"GetAllProducts Failed: {ex.Message}");
                 return null;
             }
         }

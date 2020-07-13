@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +9,7 @@ using Models.Entities;
 using Models.ManagerPanelModels;
 using Newtonsoft.Json;
 using Services.Contracts;
+using System.Linq.Dynamic.Core;
 
 namespace WebService.Controllers
 {
@@ -16,8 +19,7 @@ namespace WebService.Controllers
         private IUserServices _userServices;
         private ILogger<ManagerPanelController> logger;
 
-        private IManagerPanelService _managerPanelService;
-        //private IAdminPanelService _adminPanelService;
+        private readonly IManagerPanelService _managerPanelService;
 
         public ManagerPanelController(IUserServices userServices, ILogger<ManagerPanelController> logger, IManagerPanelService managerPanelService)
         {
@@ -76,6 +78,58 @@ namespace WebService.Controllers
             }
             ModelState.AddModelError("", "Invalid Product");
             return View(model);
+        }
+
+        public IActionResult Products()
+        {
+            try
+            {
+                var draw = HttpContext.Request.Form["draw"].FirstOrDefault();  
+                // Skiping number of Rows count  
+                var start = Request.Form["start"].FirstOrDefault();  
+                // Paging Length 10,20  
+                var length = Request.Form["length"].FirstOrDefault();  
+                // Sort Column Name  
+                var sortColumn = Request.Form["columns[" + Request.Form["order[0][column]"].FirstOrDefault() + "][name]"].FirstOrDefault();
+                logger.LogInformation($"sortColumn: {sortColumn}");
+                // Sort Column Direction ( asc ,desc)  
+                var sortColumnDirection = Request.Form["order[0][dir]"].FirstOrDefault();  
+                logger.LogInformation($"sortColumnDirection: {sortColumnDirection}");
+                // Search Value from (Search box)  
+                var searchValue = Request.Form["search[value]"].FirstOrDefault();  
+  
+                //Paging Size (10,20,50,100)  
+                int pageSize = length != null ? Convert.ToInt32(length) : 0;  
+                int skip = start != null ? Convert.ToInt32(start) : 0;  
+                int recordsTotal = 0;
+  
+                // Getting all Customer data
+                var productData = _managerPanelService.GetAllProducts();
+
+                //Sorting
+                if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
+                {
+                    productData = productData.OrderBy(sortColumn + " " + sortColumnDirection);
+                }
+                //Search
+                if (!string.IsNullOrEmpty(searchValue))
+                {
+                    productData = productData.Where(m => m.Name.ToUpper().Contains(searchValue.ToUpper()));
+                }
+  
+                //total number of rows count   
+                recordsTotal = productData.Count();  
+                //Paging   
+                var data = productData.Skip(skip).Take(pageSize).ToList();
+                logger.LogInformation($"Data: {JsonConvert.SerializeObject(data)}");
+                //Returning Json Data  
+                return Json(new { draw = draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = data });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Products Endpoint Failed: {ex.Message}");
+                return BadRequest("Exception occured");
+            }
         }
     }
 }
