@@ -1,0 +1,20 @@
+@model Models.ViewModels.AdminPanel.IndexViewModel;
+@{
+    ViewData["Title"] = "Admin Index";
+    Layout = "_LayoutAdmin";
+}
+
+<h1 class="mt-4">Dashboard</h1>
+<ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item active">Dashboard</li>
+</ol>
+<div class="text-center" style="background: #eeeeee">
+    <h1 class="display-2">TODO: Dashboard Charts</h1>
+</div>
+
+@if (Model != null)
+{
+    <h1 class="mt-4">Employees</h1>
+    await Html.RenderPartialAsync("_ManagerTable", Model);
+    await Html.RenderPartialAsync("_SellerTable", Model);
+}
