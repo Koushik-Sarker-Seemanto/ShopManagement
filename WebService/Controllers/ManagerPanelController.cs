@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -38,6 +39,8 @@ namespace WebService.Controllers
             return View();
         }
         
+
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddSeller([Bind] RegisterViewModel model)
@@ -130,6 +133,21 @@ namespace WebService.Controllers
                 logger.LogError(ex, $"Products Endpoint Failed: {ex.Message}");
                 return BadRequest("Exception occured");
             }
+        }
+        [HttpGet]
+        public async Task<IActionResult> ProductDetailes(string productId)
+        {
+            var product = await _managerPanelService.FindProductById(productId);
+            
+            return View(product);
+        }
+
+        
+        public  async Task<IActionResult> GenerateBarcode(string productId, int stock)
+        {
+            Debug.Print(" ---------------------------- " + stock + "------------" + productId);
+            var resProduct = await _managerPanelService.UpdateCurrentStock(productId, stock);
+            return RedirectToAction("Index", "Home");
         }
     }
 }

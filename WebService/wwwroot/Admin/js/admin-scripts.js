@@ -65,7 +65,7 @@
             { "data": "sellingPrice", "name": "SellingPrice", "autoWidth": true },
             { "data": "stock", "name": "Stock", "autoWidth": true },
             {
-                "render": function(data, type, full, meta) { return '<a class="btn btn-info" href="ManagerPanel/Product/'+full.id+'">Details</a>'; }
+                "render": function (data, type, full, meta) { return '<a class="btn btn-info" href="ManagerPanel/ProductDetailes?productId='+full.id+'">Details</a>'; }
             },
         ]
 
