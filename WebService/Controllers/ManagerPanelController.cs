@@ -135,7 +135,7 @@ namespace WebService.Controllers
             }
         }
         [HttpGet]
-        public async Task<IActionResult> ProductDetailes(string productId)
+        public async Task<IActionResult> ProductDetails(string productId)
         {
             var product = await _managerPanelService.FindProductById(productId);
             
@@ -143,11 +143,17 @@ namespace WebService.Controllers
         }
 
         
-        public  async Task<IActionResult> GenerateBarcode(string productId, int stock)
+        public async Task<IActionResult> GenerateBarcode(string productId, int stock, double buyingPrice)
         {
-            Debug.Print(" ---------------------------- " + stock + "------------" + productId);
-            var resProduct = await _managerPanelService.UpdateCurrentStock(productId, stock);
-            return RedirectToAction("Index", "Home");
+            logger.LogInformation($" ---------------------------- {stock} ------------ {productId}");
+            //Debug.Print(" ---------------------------- " + stock + "------------" + productId);
+            var resProduct = await _managerPanelService.UpdateCurrentStock(productId, stock, buyingPrice);
+            if (resProduct == null)
+            {
+                //Error Should be raised.
+                return RedirectToAction("ProductDetails", "ManagerPanel", new {productId = productId});
+            }
+            return RedirectToAction("ProductDetails", "ManagerPanel", new {productId = productId});
         }
     }
 }

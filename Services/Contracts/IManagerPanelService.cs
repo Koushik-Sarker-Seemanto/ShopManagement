@@ -12,7 +12,7 @@ namespace Services.Contracts
         Task<Product> AddProduct(ProductViewModel model);
         IQueryable<Product> GetAllProducts();
         public  Task<Product> FindProductById(string modelId);
-        public Task<Product> UpdateCurrentStock(string productId, int stockAmount);
+        public Task<Product> UpdateCurrentStock(string productId, int stockAmount, double buyingPrice);
 
 
     }

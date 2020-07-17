@@ -65,80 +65,106 @@ namespace Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"AddProduct Failed: {ex.Message}");
+                _logger.LogError(ex, $"FindProductById Failed: {ex.Message}");
                 return null;
             }
         }
 
-        public async Task<Product> UpdateCurrentStock(string productId, int stockAmount)
+        public async Task<Product> UpdateCurrentStock(string productId, int stockAmount, double buyingPrice)
         {
             try
             {
                 var product = await FindProductById(productId);
+                if (product == null)
+                {
+                    return null;
+                }
                 product.Stock += stockAmount;
                 await _repository.UpdateAsync<Product>(d => d.Id == productId, product);
-                GenrateBarCode(productId,stockAmount,product.Name);
+                List<string> productList = new List<string>();
+                for (int i = 1; i <= stockAmount; i++)
+                {
+                    var id = Guid.NewGuid().ToString();
+                    var individualProduct = new IndividualProduct
+                    {
+                        Id = id,
+                        CategoryId = productId,
+                        BuyingPrice = buyingPrice,
+                    };
+                    productList.Add(id);
+                    await _repository.SaveAsync<IndividualProduct>(individualProduct);
+                }
+                GenerateBarCode(productList,product.Name);
                 return product;
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Product Update Failed : {e.Message}");
+                _logger.LogError(e, $"UpdateCurrentStock: {e.Message}");
                 return null;
             }
         }
 
 
-        private void GenrateBarCode(string productId,int stock,string title)
+        private void GenerateBarCode(List<string> productList, string title)
         {
-
-
-            Dictionary<string, BaseEncodeType> collection = new Dictionary<string, BaseEncodeType>();
-            collection.Add(productId, EncodeTypes.Code11);
-            List<Bitmap> images = new List<Bitmap>();
-
-            foreach (KeyValuePair<string, BaseEncodeType> pair in collection)
+            try
             {
-                for (int i = 0; i < stock; i++)
+                Dictionary<string, BaseEncodeType> collection = new Dictionary<string, BaseEncodeType>();
+                foreach (var item in productList)
+                {
+                    collection.Add(item, EncodeTypes.Code11);
+                }
+                //collection.Add(productId, EncodeTypes.Code11);
+                List<Bitmap> images = new List<Bitmap>();
+
+                foreach (KeyValuePair<string, BaseEncodeType> pair in collection)
                 {
                     BarcodeGenerator builder = new BarcodeGenerator(pair.Value, pair.Key);
                     images.Add(builder.GenerateBarCodeImage());
+                    /*for (int i = 0; i < stock; i++)
+                    {
+                        BarcodeGenerator builder = new BarcodeGenerator(pair.Value, pair.Key);
+                        images.Add(builder.GenerateBarCodeImage());
+                    }*/
                 }
-            }
 
-            int maxWidth = int.MinValue;
-            int sumHeight = 0;
-            foreach (Bitmap bmp in images)
-            {
-                sumHeight += bmp.Height;
-                if (maxWidth < bmp.Width)
-                    maxWidth = bmp.Width;
-            }
-
-            const int offset = 10;
-            Bitmap resultBitmap = new Bitmap(maxWidth + offset * 2, sumHeight + offset * images.Count);
-            using (Graphics g = Graphics.FromImage(resultBitmap))
-            {
-                g.Clear(Color.White);
-
-                int yPosition = offset;
-                Font drawFont = new Font("Arial", 16);
-                SolidBrush drawBrush = new SolidBrush(Color.Black);
-                // Todo: Fix Product Title Part
-                g.DrawString("Product Name :  " + title, drawFont, drawBrush, offset, yPosition);
-                yPosition += offset+20;
-                for (int i = 0; i < images.Count; ++i)
+                int maxWidth = int.MinValue;
+                int sumHeight = 0;
+                foreach (Bitmap bmp in images)
                 {
-                    Bitmap currentBitmap = images[i];
-                    g.DrawImage(currentBitmap, offset, yPosition);
-                    yPosition += currentBitmap.Height + offset;
+                    sumHeight += bmp.Height;
+                    if (maxWidth < bmp.Width)
+                        maxWidth = bmp.Width;
                 }
-            }
 
-            var name =  title+" "+ DateTime.Now.ToString("MMMM dd HH-mm tt") + ".png";
-            // Debug.Print(DateTime.Now.ToString("MMMM dd HH-mm tt"));
-            
-            resultBitmap.Save($"wwwroot\\images\\" + name, ImageFormat.Png);
-            
+                const int offset = 10;
+                Bitmap resultBitmap = new Bitmap(maxWidth + offset * 2, sumHeight + offset * images.Count);
+                using (Graphics g = Graphics.FromImage(resultBitmap))
+                {
+                    g.Clear(Color.White);
+
+                    int yPosition = offset;
+                    Font drawFont = new Font("Arial", 16);
+                    SolidBrush drawBrush = new SolidBrush(Color.Black);
+                    // Todo: Fix Product Title Part
+                    g.DrawString("Product Name :  " + title, drawFont, drawBrush, offset, yPosition);
+                    yPosition += offset+20;
+                    for (int i = 0; i < images.Count; ++i)
+                    {
+                        Bitmap currentBitmap = images[i];
+                        g.DrawImage(currentBitmap, offset, yPosition);
+                        yPosition += currentBitmap.Height + offset;
+                    }
+                }
+
+                var name =  title+" "+ DateTime.Now.ToString("MMMM dd HH-mm tt") + ".png";
+                
+                resultBitmap.Save($"wwwroot/images/" + name, ImageFormat.Png);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"GenerateBarCode Failed : {e.Message}");
+            }
         }
 
         public IQueryable<Product> GetAllProducts()
