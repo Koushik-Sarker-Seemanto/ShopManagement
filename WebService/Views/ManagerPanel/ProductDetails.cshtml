@@ -1,0 +1,141 @@
+﻿@model Models.Entities.Product
+@{
+    ViewData["Title"] = "Product Details";
+    Layout = "_LayoutManager";
+}
+
+
+
+
+@if (Model != null)
+{
+    <div class="col-lg-8 col-md-9 col-sm-12 pt-3 m-auto">
+        <div class="card text-black mb-4">
+            <div class="card-header text-center" style="background: #eeeeee"><h1>Product Details</h1></div>
+            <div class="card-body p-5 bg-light">
+                <label for="name">Name</label>
+                @if (@Model.Name != null)
+                {
+                    <p id="name" class="list-group-item">@Model.Name</p>
+                }
+                else
+                {
+                    <p id="name" class="list-group-item">N/A</p>
+                }
+                <br/>
+                <label for="buyingPrice2">Buying Price</label>
+                <p id="buyingPrice2" class="list-group-item">@Model.BuyingPrice</p>
+                <br/>
+                <label for="sellingPrice">Selling Price</label>
+                <p id="sellingPrice" class="list-group-item">@Model.SellingPrice</p>
+                <br/>
+                <label for="stock">Stock</label>
+                <p id="stock" class="list-group-item">@Model.Stock</p>
+                <br/>
+                
+                <label for="details">Description</label>
+                @if (@Model.Details != null)
+                {
+                    <p id="details" class="list-group-item">@Model.Details</p>
+                }
+                else
+                {
+                    <p id="details" class="list-group-item">N/A</p>
+                }
+                <br/>
+                
+                <form method="get" style="margin-left: 5%; margin-right: 5%;margin-top:5% " asp-controller="ManagerPanel" asp-action="GenerateBarcode">
+                    <label><b>Stock To Add</b></label>
+                
+                    <input class="form-control py-4" id="stock" name="stock" placeholder="Enter Stock Amount to Add">
+                    <input class="form-control py-4" id="buyingPrice" name="buyingPrice" placeholder="Enter Buying Price">
+                    <input class="form-control py-4" id="productId" name="productId" style="visibility: hidden" value="@Model.Id">
+                    <input type="submit" class="btn btn-success" value="Generate Barcode"/>
+                </form>
+            </div>
+            
+        </div>
+    </div>
+}
+else
+{
+    <div class="col-md-6 pt-3 m-auto">
+        <div class="card text-black mb-4">
+            <div class="card-header text-center"><h1>Product Details</h1></div>
+            <div class="card-body text-center">
+                <h1> Not Found!</h1>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+
+
+
+@*
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                <div class="card-header"><h3 class="text-center font-weight-light my-4"> Product Details</h3></div>
+                <div class="card-body" style="text-align: center">
+                    @if (Model != null)
+                    {
+                        <label><b>Product Title</b></label>
+                        <br>
+                        @if (Model.Name != null)
+                        {
+                            <span style="margin-top: -1%">@Model.Name </span>
+                        }
+                        else
+                        {
+                            <span style="margin-top: -1%">N/A </span>
+                        }
+                        <br/>
+                        <label><b>Buying Price</b></label>
+                        <br>
+                        <span style="margin-top: -1%">@Model.BuyingPrice </span>
+                        <br/>
+                        <label><b>Selling Price</b></label>
+                        <br>
+                        <span>@Model.SellingPrice</span>
+                        <br/>
+                        <label><b>Current Stock</b></label>
+                        <br>
+                        <span>@Model.Stock</span>
+                        <br/>
+                        <label><b>Description</b></label>
+                        <br>
+                        @if (Model.Details != null)
+                        {
+                            <span style="margin-top: -1%">@Model.Details </span>
+                        }
+                        else
+                        {
+                            <span style="margin-top: -1%">N/A </span>
+                        }
+                        <br/>
+                        
+                        <form style="margin-left: 5%; margin-right: 5%;margin-top:5% " action="GenerateBarcode">
+                            <label><b>Stock To Add</b></label>
+
+                            <input class="form-control py-4" id="stock" name="stock" placeholder="Enter Stock Amount to Add">
+                            <input class="form-control py-4" id="productId" name="productId" style="visibility: hidden" value="@Model.Id">
+                            <input type="submit" class="btn btn-success" value="Generate Barcode"/>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="text-center h1">No Product Found!!!</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+*@
