@@ -5,4 +5,49 @@
 
 <div class="text-center">
     <h1 class="display-1">Welcome to Seller Index Page!</h1>
+
+    <input placeholder="Product Ide" id="inbox" />
 </div>
+
+@{
+    await Html.RenderPartialAsync("_ProductTable");
+}
+
+<script>
+    var total = 0.00;
+    $('#inbox').keyup(function(e) {
+        if (e.keyCode == 13) {
+            //your code
+            var str = $("#inbox").val();
+            
+
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetProduct", "SellerPanel")',
+                contentType: "application/json; charset=utf-8",
+                data: {
+                    //Passing Input parameter
+                    id: $('#inbox').val()
+                },
+                success: function (response) {
+                    var json_response = JSON.stringify(response);
+
+                    $('#inbox').val('');
+                    if (response.status === "Not Found") {
+                        alert("Product Not Found");
+                    } else {
+                        total  = (parseFloat(total) + parseFloat(response.res.sellingPrice)).toFixed(1);
+                        var trHTML = '';
+                        trHTML += '<tr class="text-center"><td>' + response.res.productTitle + '</td><td>' + response.res.sellingPrice + '</td><td><i value="Delete" type="button" alt="Delete6" class="deleteIcon fa fa-trash"></i></td></tr>';
+                        $('#sellerDataTable').append(trHTML);
+                        console.log(total.toString())
+                        $('#total').html(total.toString());
+                    }
+                },
+                error: function (response) {
+                    alert(response);
+                }
+            });
+        }
+    });
+</script>

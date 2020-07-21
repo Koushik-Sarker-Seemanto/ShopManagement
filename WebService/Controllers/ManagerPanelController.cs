@@ -11,6 +11,7 @@ using Models.ManagerPanelModels;
 using Newtonsoft.Json;
 using Services.Contracts;
 using System.Linq.Dynamic.Core;
+using Models.CommonEnums;
 
 namespace WebService.Controllers
 {
@@ -49,6 +50,8 @@ namespace WebService.Controllers
             {
                 return View(model);
             }
+
+            model.Role = Roles.Seller;
             var result = await _userServices.RegisterUser(model);
             logger.LogInformation($"RegisterViewModel: {JsonConvert.SerializeObject(result)}");
             if (result!=null)

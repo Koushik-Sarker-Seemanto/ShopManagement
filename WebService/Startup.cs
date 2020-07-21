@@ -37,7 +37,9 @@ namespace WebService
                     options.AccessDeniedPath = "/AdminAuth/UnauthorizedPage/";
                     options.Cookie.Name = "UserLoginCookie";
                 });
-            
+            services.AddRazorPages()
+                .AddRazorRuntimeCompilation();
+
             services.AddAuthorization(option =>
             {
                 option.AddPolicy("Admin", policy =>
@@ -56,6 +58,7 @@ namespace WebService
 
             services.AddSingleton<IMongoRepository, MongoRepository>();
             services.AddSingleton<IUserServices, UserServices>();
+            services.AddSingleton<ISellerPanelService, SellerPanelService>();
             services.AddSingleton<IAdminPanelService, AdminPanelService>();
             services.AddSingleton<IManagerPanelService, ManagerPanelService>();
             
