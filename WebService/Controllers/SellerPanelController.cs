@@ -37,5 +37,14 @@ namespace WebService.Controllers
 
             return Json(new {status = "Not Found" });
         }
+
+        [HttpPost]
+        public async Task<IActionResult> SellProduct()
+        {
+            var order = Request.Form["order"].ToArray();
+
+            return Json(new {status = "Fail"});
+
+        }
     }
 }

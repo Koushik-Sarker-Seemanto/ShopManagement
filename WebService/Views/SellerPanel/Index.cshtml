@@ -7,19 +7,26 @@
     <h1 class="display-1">Welcome to Seller Index Page!</h1>
 
     <input placeholder="Product Ide" id="inbox" />
+    <input placeholder="Name" id="name" />
+    <input placeholder="Phone Number" id="phone" />
 </div>
+
 
 @{
     await Html.RenderPartialAsync("_ProductTable");
 }
 
+<div style="text-align: center">
+    <button class="btn btn-success" id="checkout"> Checkout </button>
+</div>
+
 <script>
     var total = 0.00;
+    var array = [];
     $('#inbox').keyup(function(e) {
         if (e.keyCode == 13) {
             //your code
             var str = $("#inbox").val();
-            
 
             $.ajax({
                 type: "GET",
@@ -38,9 +45,9 @@
                     } else {
                         total  = (parseFloat(total) + parseFloat(response.res.sellingPrice)).toFixed(1);
                         var trHTML = '';
-                        trHTML += '<tr class="text-center"><td>' + response.res.productTitle + '</td><td>' + response.res.sellingPrice + '</td><td><i value="Delete" type="button" alt="Delete6" class="deleteIcon fa fa-trash"></i></td></tr>';
+                        trHTML += '<tr class="text-center"><td>' + response.res.productTitle + '</td><td>' + response.res.sellingPrice + '</td><td><a href="javascript: removeTable(3dc2b2eb - 6194 - 440e-8474 - f8a4aeceb6fb) " value="Delete" type="button" alt="Delete6" class="deleteIcon fa fa-trash"></i></td></tr>';
                         $('#sellerDataTable').append(trHTML);
-                        console.log(total.toString())
+                        array.push(response.res.id);
                         $('#total').html(total.toString());
                     }
                 },
@@ -50,4 +57,48 @@
             });
         }
     });
+
+
+    $('#discount').keyup(function(e) {
+        if (e.keyCode == 13) {
+            total = (parseFloat(total) - parseFloat($("#discount").val())).toFixed(1);
+            $('#total').html(total.toString());
+        }
+    });
+
+    function removeTable(id) {
+        alert(id);
+    }
+
+    $('#checkout').click(function () {
+
+        var data = {
+            name: $('#name').val(),
+            phone: $('#phone').val(),
+            order: array
+        }
+        console.log(array.length);
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SellProduct", "SellerPanel")',
+            datatype: "json",
+            data: {
+                //Passing Input parameter
+                name: $('#name').val(),
+                phone: $('#phone').val(),
+                order: JSON.stringify(array)
+            },
+            success: function (response) {
+                if (response.status === "Ok") {
+                    alert("OK");
+                } else {
+                    alert("Fail");
+                }
+            },
+            error: function (response) {
+                alert("Fail Req");
+            }
+        });
+    });
+
 </script>
