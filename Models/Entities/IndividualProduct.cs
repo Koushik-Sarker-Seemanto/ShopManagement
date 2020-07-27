@@ -11,8 +11,16 @@ namespace Models.Entities
 
         public string CategoryId { get; set; }
         public double BuyingPrice { get; set; }
+
+        [BsonDefaultValue(false)]
+        public bool Sold { get; set; }
+
         [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
         [BsonRepresentation(BsonType.DateTime)]
         public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+        [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
+        [BsonRepresentation(BsonType.DateTime)]
+        public DateTime SoldAt { get; set; } 
     }
 }

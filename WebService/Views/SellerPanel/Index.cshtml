@@ -86,6 +86,8 @@
                 //Passing Input parameter
                 name: $('#name').val(),
                 phone: $('#phone').val(),
+                pay: "Due",
+                total : total,
                 order: JSON.stringify(array)
             },
             success: function (response) {

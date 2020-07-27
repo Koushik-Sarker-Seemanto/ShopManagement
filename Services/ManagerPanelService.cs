@@ -70,6 +70,14 @@ namespace Services
             }
         }
 
+        public async Task<Product> StockReduce(string id)
+        {
+            var product = await FindProductById(id);
+            product.Stock -= 1;
+            await _repository.UpdateAsync<Product>(d => d.Id == id, product);
+            return product;
+        }
+
         public async Task<Product> UpdateCurrentStock(string productId, int stockAmount, double buyingPrice)
         {
             try
