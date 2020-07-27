@@ -2,23 +2,45 @@
     ViewData["Title"] = "Seller Index";
     Layout = "_LayoutSeller";
 }
-
-<div class="text-center">
-    <h1 class="display-1">Welcome to Seller Index Page!</h1>
-
-    <input placeholder="Product Ide" id="inbox" />
-    <input placeholder="Name" id="name" />
-    <input placeholder="Phone Number" id="phone" />
+<div style="text-align: center; margin-top: 1%;margin-bottom: 2%">
+    
+    <h3>Purchase Counter</h3>
 </div>
+<div class="row">
+    <div class="col-8"style="margin-top: 5%">
+    
+        <div class="col-4" style="margin-top: 2%;margin-bottom: 1%">
+            <input style="border: 2px solid black;margin-left: -5%" class="form-control" placeholder="Product Id" id="inbox" />
+        </div>
 
+    </div>
+    <div class="col-1"></div>
+    <div class="col-3" style="padding: 1%; text-align: left" >
+        <div class="col-12">
+            <input style="border: 2px solid black; margin-top:3%" class="form-control" placeholder="Customer Name" id="name" />
+            <input style="border: 2px solid black;margin-top: 2%" class="form-control" placeholder="Phone Number" id="phone" />
 
+        </div>
+        
+
+    </div>
+
+</div>
 @{
     await Html.RenderPartialAsync("_ProductTable");
 }
+<div class="row">
+    <div class="col-11"></div>
+    <div class="form-check" style="align-items: flex-end">
+        <input type="checkbox" style="color:red" class="form-check-input" id="due">
+        <label class="form-check-label" style="color:red" for="due">Due Bill</label>
+    </div>
 
+</div>
 <div style="text-align: center">
     <button class="btn btn-success" id="checkout"> Checkout </button>
 </div>
+
 
 <script>
     var total = 0.00;
@@ -78,6 +100,14 @@
             order: array
         }
         console.log(array.length);
+        var due = "";
+        var checkBox = document.getElementById("due");
+        if (checkBox.checked === true) {
+            due = "Due";
+        } else {
+            due = "Paid";
+        }
+        
         $.ajax({
             type: "POST",
             url: '@Url.Action("SellProduct", "SellerPanel")',
@@ -86,7 +116,7 @@
                 //Passing Input parameter
                 name: $('#name').val(),
                 phone: $('#phone').val(),
-                pay: "Due",
+                pay: due,
                 total : total,
                 order: JSON.stringify(array)
             },
