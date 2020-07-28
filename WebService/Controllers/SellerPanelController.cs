@@ -33,7 +33,9 @@ namespace WebService.Controllers
                 if (res != null)
                 {
                     Debug.Print("a " +res.ProductTitle );
-                    
+                    if(res.Sold)
+                        return Json(new { res = res, status = "Sold" });
+
                     return Json(new {res = res, status = "Found"});
                 }
             }
@@ -50,11 +52,18 @@ namespace WebService.Controllers
             var phone = Request.Form["phone"].ToString();
             var paystatus = Request.Form["pay"].ToString();
             var totals = Request.Form["total"].ToString();
+            var discouts = Request.Form["discount"].ToString();
             var total = int.Parse(totals);
+            var discout = int.Parse(discouts);
             var lst = new List<string>();
             Debug.Print(order.Length+"aaa");
             for(int i = 0 ;i<order.Length;i++)
                 lst.Add(order[i]);
+
+            if (lst.Count <= 0)
+            {
+                return Json(new { status = "Fail" });
+            }
 
             var orderModel = new OrderViewModel
             { 
@@ -62,6 +71,7 @@ namespace WebService.Controllers
                 Name = name,
                 Phone = phone,
                 Amount = total,
+                Discount = discout
             };
 
             if (paystatus != null)
@@ -81,7 +91,7 @@ namespace WebService.Controllers
                 // Error
             }
 
-            Debug.Print(orderModel.Name);
+            Debug.Print(orderModel.Name + " " + orderModel.Amount +" "+ orderModel.Paid.ToString() + " " + orderModel.Phone);
             var orderRes = await _sellerPanelService.MakeOrder(orderModel);
             if (orderRes == null)
             {

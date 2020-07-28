@@ -1,8 +1,11 @@
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Models.AdminAuthModels;
+using Models.Entities;
 using Newtonsoft.Json;
 using Services.Contracts;
 
@@ -60,5 +63,8 @@ namespace WebService.Controllers
             ModelState.AddModelError("", "Invalid Registration");
             return View(model);
         }
+
+      
+
     }
 }

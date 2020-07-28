@@ -28,24 +28,40 @@ namespace Services
             if (id != null)
             {
                 var indevidualProduct = await _repository.GetItemAsync<IndividualProduct>(d => d.Id == id);
-                var Mainproduct = await _managerPanelService.FindProductById(indevidualProduct.CategoryId);
-                if (Mainproduct != null)
-                {
-                    if (Mainproduct.Stock <= 0)
-                    {
-                        return null;
-                    }
-                }
                 if (indevidualProduct != null)
                 {
-                    var product = await _repository.GetItemAsync<Product>(d => d.Id == indevidualProduct.CategoryId);
-                    if (product != null)
+
+                    var Mainproduct = await _managerPanelService.FindProductById(indevidualProduct.CategoryId);
+                    if (Mainproduct != null)
                     {
-                        resProduct = new ProductSellViewModel();
-                        resProduct.Id = indevidualProduct.Id;
-                        resProduct.ProductTitle = product.Name;
-                        resProduct.SellingPrice = product.SellingPrice;
-                        return resProduct;
+                        if (Mainproduct.Stock <= 0)
+                        {
+                            return null;
+                        }
+                    }
+                    if (indevidualProduct != null)
+                    {
+                        var product = await _repository.GetItemAsync<Product>(d => d.Id == indevidualProduct.CategoryId);
+                        if (product != null)
+                        {
+                            resProduct = new ProductSellViewModel();
+                            resProduct.Id = indevidualProduct.Id;
+                            resProduct.ProductTitle = product.Name;
+                            resProduct.SellingPrice = product.SellingPrice;
+                            resProduct.Sold = false;
+                            
+                            Debug.Print(indevidualProduct.SoldAt.Year + "Day OF YEAR");
+                            if (indevidualProduct.SoldAt != null)
+                            {
+                                if (indevidualProduct.SoldAt.Year > 2000)
+                                {
+                                    resProduct.Sold = true;
+                                }
+                            }
+
+
+                            return resProduct;
+                        }
                     }
                 }
             }
@@ -62,8 +78,11 @@ namespace Services
                 Id = id,
                 Name = order.Name,
                 Phone = order.Phone,
-                Amount = order.Amount
+                Amount = order.Amount,
+                Paid    = order.Paid,
+                Discount = order.Discount
             };
+            
             var list = await GetIndividualProducts(order.Order);
             if (list == null) return null;
             orderModel.Products = list;

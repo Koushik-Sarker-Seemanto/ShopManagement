@@ -14,6 +14,7 @@ namespace Services.Contracts
         public  Task<Product> FindProductById(string modelId);
         public Task<Product> UpdateCurrentStock(string productId, int stockAmount, double buyingPrice);
         public  Task<Product> StockReduce(string id);
+        public IQueryable<Product> GetAllStockEnd();
 
 
     }

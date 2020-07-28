@@ -188,5 +188,19 @@ namespace Services
                 return null;
             }
         }
+        public IQueryable<Product> GetAllStockEnd()
+        {
+            try
+            {
+                var results = _repository.GetItems<Product>(d=>d.StockWarning<=d.Stock);
+                return results;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"GetAllProducts Failed: {ex.Message}");
+                return null;
+            }
+        }
+        
     }
 }

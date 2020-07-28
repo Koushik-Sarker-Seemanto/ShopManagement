@@ -11,5 +11,6 @@ namespace Models.ViewModels.SellerPanel
         public List<string> Order { get; set; }
         public bool Paid { get; set; }
         public int Amount { get; set; }
+        public int Discount { get; set; }
     }
 }

@@ -1,63 +1,4 @@
-@{
-    ViewData["Title"] = "Seller Index";
-    Layout = "_LayoutSeller";
-}
-<style>
-    .fullDisplay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        width: 100%;
-        z-index: 9999999;
-    }
-</style>
-<div style="text-align: center; margin-top: 1%;margin-bottom: 2%">
-
-    <h3>Purchase Counter</h3>
-</div>
-<div id="loading" class="fullDisplay" style="background-color: white;display: none">
-    <div style="background: url('/images/loading.gif') no-repeat center center;" class="fullDisplay"></div>
-
-</div>
-<div class="row">
-    <div class="col-8" style="margin-top: 5%">
-
-        <div class="col-4" style="margin-top: 2%;margin-bottom: 1%">
-            <input style="border: 2px solid black;margin-left: -5%" class="form-control" placeholder="Product Id" id="inbox" />
-        </div>
-
-    </div>
-    <div class="col-1"></div>
-    <div class="col-3" style="padding: 1%; text-align: left">
-        <div class="col-12">
-            <input style="border: 2px solid black; margin-top:3%" class="form-control" placeholder="Customer Name" id="name" />
-            <input style="border: 2px solid black;margin-top: 2%" class="form-control" placeholder="Phone Number" id="phone" />
-
-        </div>
-
-
-    </div>
-
-</div>
-@{
-    await Html.RenderPartialAsync("_ProductTable");
-}
-<div class="row">
-    <div class="col-11"></div>
-    <div class="form-check" style="align-items: flex-end">
-        <input type="checkbox" style="color:red" class="form-check-input" id="due">
-        <label class="form-check-label" style="color:red" for="due">Due Bill</label>
-    </div>
-
-</div>
-
-<div style="text-align: center">
-    <button class="btn btn-success" id="checkout"> Checkout </button>
-</div>
-
-<script>
-
+﻿
     var total = 0.00;
     var discount = 0.00;
     var array = [];
@@ -79,19 +20,19 @@
                 url: '@Url.Action("GetProduct", "SellerPanel")',
                 contentType: "application/json; charset=utf-8",
                 data: {
-                    id: $('#inbox').val()
+        id: $('#inbox').val()
                 },
                 success: function (response) {
                     var json_response = JSON.stringify(response);
 
                     $('#inbox').val('');
                     if (response.status === "Not Found") {
-                        alert("Product Not Found");
+        alert("Product Not Found");
                     } else if (response.status === "Sold") {
-                        alert("Already Sold");
+        alert("Already Sold");
                     }
                     else {
-                        total = (parseFloat(total) + parseFloat(response.res.sellingPrice)).toFixed(1);
+        total = (parseFloat(total) + parseFloat(response.res.sellingPrice)).toFixed(1);
                         var trHTML = '';
                         trHTML += '<tr id="' + response.res.id +'" class="text-center"><td>' + response.res.productTitle + '</td><td>' + response.res.sellingPrice + '</td><td><a href="#" style="cursor: pointer" class="deleteIcon fa fa-trash"></i></td></tr>';
                         $('#sellerDataTable').append(trHTML);
@@ -100,7 +41,7 @@
                     }
                 },
                 error: function (response) {
-                    alert(response);
+        alert(response);
                 }
             });
         }
@@ -110,10 +51,6 @@
     $('#discount').keyup(function(e) {
         if (e.keyCode === 13) {
             var amountToShow = (parseFloat(total) - parseFloat($("#discount").val())).toFixed(1);
-            if (amountToShow <= 0) {
-                alert("Discount Can not be greater than amount");
-                return;
-            }
             discount =  parseFloat($("#discount").val());
             $('#total').html(amountToShow.toString());
         }
@@ -121,16 +58,12 @@
 
     $('#checkout').click(function () {
 
-        if (array.length <= 0) {
-            alert("No Product added");
-            return;
-        }
         var data = {
         name: $('#name').val(),
             phone: $('#phone').val(),
             order: array
         }
-        
+        console.log(array.length);
         var due = "";
         var checkBox = document.getElementById("due");
         if (checkBox.checked === true) {
@@ -145,28 +78,23 @@
             datatype: "json",
             data: {
         //Passing Input parameter
-                name: $('#name').val(),
+        name: $('#name').val(),
                 phone: $('#phone').val(),
                 pay: due,
-                total: total,
-                discount : discount,
+                total : total ,
                 order: JSON.stringify(array)
             },
             success: function (response) {
-                if(response.status === "Ok") {
-                    alert("Successfully Sold")
-                    location.reload(true);
-                }
-                else {
-                    alert("Fail");
+                if (response.status === "Ok") {
+        location.reload(true);
+                } else {
+        alert("Fail");
                 }
             },
             error: function (response) {
-                alert("Fail Req");
+        alert("Fail Req");
             }
         });
     });
 
 
-
-</script>
