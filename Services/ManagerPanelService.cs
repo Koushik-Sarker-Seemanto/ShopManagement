@@ -9,6 +9,7 @@ using Aspose.BarCode.Generation;
 using Microsoft.Extensions.Logging;
 using Models.Entities;
 using Models.ManagerPanelModels;
+using MongoDB.Bson;
 using Repositories;
 using Services.Contracts;
 
@@ -34,7 +35,7 @@ namespace Services
                     {
                         Id = guid,
                         Name = model.Name,
-                        BuyingPrice = model.BuyingPrice,
+                        StockWarning = model.StockWarning,
                         SellingPrice = model.SellingPrice,
                         Details = model.Details,
                     };
@@ -74,6 +75,7 @@ namespace Services
         {
             var product = await FindProductById(id);
             product.Stock -= 1;
+            if (product.StockWarning >= product.Stock) product.Warning = true;
             await _repository.UpdateAsync<Product>(d => d.Id == id, product);
             return product;
         }
@@ -88,6 +90,7 @@ namespace Services
                     return null;
                 }
                 product.Stock += stockAmount;
+                if (product.StockWarning < product.Stock) product.Warning = false;
                 await _repository.UpdateAsync<Product>(d => d.Id == productId, product);
                 List<string> productList = new List<string>();
                 for (int i = 1; i <= stockAmount; i++)
@@ -192,7 +195,8 @@ namespace Services
         {
             try
             {
-                var results = _repository.GetItems<Product>(d=>d.StockWarning<=d.Stock);
+                var results = _repository.GetItems<Product>(d=>d.Warning == true);
+                
                 return results;
             }
             catch (Exception ex)

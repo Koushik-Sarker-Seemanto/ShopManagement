@@ -12,10 +12,11 @@ namespace Models.Entities
         public string Name { get; set; }
         [BsonRequired]
         public double SellingPrice { get; set; }
-        [BsonRequired]
-        public double BuyingPrice { get; set; }
-
+        
         public int Stock { get; set; } = 0;
+        public int StockWarning { get; set; } = 0;
+        [BsonDefaultValue(true)]
+        public bool Warning { get; set; }
         public string Details { get; set; }
     }
 }

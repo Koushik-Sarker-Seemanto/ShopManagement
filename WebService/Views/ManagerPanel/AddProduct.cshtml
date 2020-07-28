@@ -18,15 +18,16 @@
                             <input asp-for="Name" class="form-control py-4" id="name" type="text" placeholder="Enter Name">
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
-                        <div class="form-group">
-                            <label class="small mb-1" for="buyingPrice">Buying Price</label>
-                            <input asp-for="BuyingPrice" class="form-control py-4" id="buyingPrice" placeholder="Enter Buying Price">
-                            <span asp-validation-for="BuyingPrice" class="text-danger"></span>
-                        </div>
+
                         <div class="form-group">
                             <label class="small mb-1" for="sellingPrice">Selling Price</label>
                             <input asp-for="SellingPrice" class="form-control py-4" id="sellingPrice" placeholder="Enter Selling Price">
                             <span asp-validation-for="SellingPrice" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="small mb-1" for="buyingPrice">Stock Empty Warning</label>
+                            <input asp-for="StockWarning" class="form-control py-4" id="buyingPrice" placeholder="Enter Warning Amount( Stock Empty Warning)">
+                            <span asp-validation-for="StockWarning" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label class="small mb-1" for="details">Details</label>

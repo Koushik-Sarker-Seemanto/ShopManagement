@@ -163,6 +163,8 @@ namespace WebService.Controllers
                 // Getting all Customer data
                 var productData = _managerPanelService.GetAllStockEnd();
 
+                //productData = productData.AsQueryable().Where(d=>d.StockWarning>=d.Stock);
+
                 //Sorting
                 if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
                 {
