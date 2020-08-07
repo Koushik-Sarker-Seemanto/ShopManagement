@@ -2,7 +2,9 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Models.ViewModels.SellerPanel;
+using Newtonsoft.Json;
 using Services.Contracts;
 
 namespace WebService.Controllers
@@ -11,9 +13,11 @@ namespace WebService.Controllers
     public class SellerPanelController : Controller
     {
         private ISellerPanelService _sellerPanelService;
-        public SellerPanelController(ISellerPanelService sellerPanelService)
+        private ILogger<SellerPanelController> logger;
+        public SellerPanelController(ISellerPanelService sellerPanelService, ILogger<SellerPanelController> logger)
         {
             _sellerPanelService = sellerPanelService;
+            this.logger = logger;
         }
         // GET
         public IActionResult Index()
@@ -42,7 +46,11 @@ namespace WebService.Controllers
         public async Task<IActionResult> SellProduct()
         {
             var order = Request.Form["order"].ToArray();
-
+            var name = Request.Form["name"].ToArray();
+            var phone = Request.Form["phone"].ToArray();
+            logger.LogInformation($"Orderssssssssssss: {JsonConvert.SerializeObject(order)}");
+            logger.LogInformation($"nameeeeeeeeeeee: {JsonConvert.SerializeObject(name)}");
+            logger.LogInformation($"Phoneeeeeeeeeeee: {JsonConvert.SerializeObject(phone)}");
             return Json(new {status = "Fail"});
 
         }
