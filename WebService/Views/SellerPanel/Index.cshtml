@@ -2,14 +2,43 @@
     ViewData["Title"] = "Seller Index";
     Layout = "_LayoutSeller";
 }
+<style>
+    .fullDisplay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        z-index: 9999999;
+    }
+</style>
+<div style="text-align: center; margin-top: 1%;margin-bottom: 2%">
 
-<div class="text-center">
-    <h1 class="display-1">Welcome to Seller Index Page!</h1>
+    <h3>Purchase Counter</h3>
+</div>
+<div id="loading" class="fullDisplay" style="background-color: white;display: none">
+    <div style="background: url('/images/loading.gif') no-repeat center center;" class="fullDisplay"></div>
+
 
     @*<input placeholder="Product Id" id="inbox" />
     <input placeholder="Name" id="name" />
     <input placeholder="Phone Number" id="phone" />*@
+
 </div>
+<div class="row">
+    <div class="col-8" style="margin-top: 5%">
+
+        <div class="col-4" style="margin-top: 2%;margin-bottom: 1%">
+            <input style="border: 2px solid black;margin-left: -5%" class="form-control" placeholder="Product Id" id="inbox" />
+        </div>
+
+    </div>
+    <div class="col-1"></div>
+    <div class="col-3" style="padding: 1%; text-align: left">
+        <div class="col-12">
+            <input style="border: 2px solid black; margin-top:3%" class="form-control" placeholder="Customer Name" id="name" />
+            <input style="border: 2px solid black;margin-top: 2%" class="form-control" placeholder="Phone Number" id="phone" />
+
 
 <div id="content" class="card mb-4">
     <div class="card-header" id="manager-table-header" style="cursor: pointer">
@@ -42,6 +71,7 @@
         await Html.RenderPartialAsync("_ProductTable");
     }
 </div>
+
 <div style="text-align: center">
     <button class="btn btn-success" id="checkout"> Checkout </button>
 </div>
@@ -53,20 +83,26 @@
 
 <script>
 
-    //751f5413-abe1-4624-b646-a2d67c87a8bc
-    //0bb55003-b095-44af-af58-db5c6f1c7a7a
+
     var array = [];
-    $('#inbox').keyup(function(e) {
+
+    $(document).ajaxStart(function () {
+        $("#loading").css("display", "block");
+    });
+
+    $(document).ajaxComplete(function(){
+        $("#loading").css("display", "none");
+    });
+
+    $('#inbox').keyup(function (e) {
         if (e.keyCode == 13) {
-            //your code
             var str = $("#inbox").val();
 
             $.ajax({
-                type: "GET",
+        type: "GET",
                 url: '@Url.Action("GetProduct", "SellerPanel")',
                 contentType: "application/json; charset=utf-8",
                 data: {
-                    //Passing Input parameter
                     id: $('#inbox').val()
                 },
                 success: function (response) {
@@ -75,10 +111,12 @@
                     $('#inbox').val('');
                     if (response.status === "Not Found") {
                         alert("Product Not Found");
+
                     } else {
                         var trHTML = '';
                         trHTML += '<tr class="eachItem"><td class="text-center productName">' + response.res.productTitle + '</td><td class="text-center productPrice">' + response.res.sellingPrice + '</td><td class="text-center"><button onclick="javascript: removeRow(this)" class="deleteIcon btn btn-danger">Remove</button></td></tr>';
                         $('#productToBeSold').append(trHTML);
+
                         array.push(response.res.id);
                         $('#total').text(getTotalPrice());
                     }
@@ -92,6 +130,7 @@
 
 
     $('#discount').keyup(function(e) {
+
         if (e.keyCode == 13) {
             $('#total').text(getTotalPrice());
         }
@@ -108,20 +147,26 @@
         createInvoice();
         
         console.log(array.length);
+
         $.ajax({
-            type: "POST",
+        type: "POST",
             url: '@Url.Action("SellProduct", "SellerPanel")',
             datatype: "json",
             data: {
-                //Passing Input parameter
+        //Passing Input parameter
                 name: $('#name').val(),
                 phone: $('#phone').val(),
+                pay: due,
+                total: total,
+                discount : discount,
                 order: JSON.stringify(array)
             },
             success: function (response) {
-                if (response.status === "Ok") {
-                    alert("OK");
-                } else {
+                if(response.status === "Ok") {
+                    alert("Successfully Sold")
+                    location.reload(true);
+                }
+                else {
                     alert("Fail");
                 }
             },
@@ -142,6 +187,7 @@
     }
 
 </script>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js" integrity="sha512-s/XK4vYVXTGeUSv4bRPOuxSDmDlTedEpMEcAQk0t/FMd9V6ft8iXdwSBxV0eD60c6w/tjotSlKu9J2AAW1ckTA==" crossorigin="anonymous"></script>
@@ -226,4 +272,3 @@
             doc.output('dataurlnewwindow');
         });
     }
-</script>

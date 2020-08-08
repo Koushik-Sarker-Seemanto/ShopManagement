@@ -1,0 +1,54 @@
+﻿
+@{
+    ViewData["Title"] = "StockRemaining";
+    Layout = "_LayoutManager";
+}
+<div class="table-responsive">
+    <table class="table table-bordered" id="productTable" width="100%" cellspacing="0">
+        <thead>
+        <<tr class="text-center">
+            <th>Name</th>
+            <th>Stock Warning</th>
+            <th>Selling Price</th>
+            <th>Stock</th>
+            <th>Action Link</th>
+        </tr>
+        </thead>
+                
+    </table>
+</div>
+<script>
+    $("#productTable").DataTable({
+        "processing": true, // for show progress bar    
+        "serverSide": true, // for process server side    
+        "filter": true, // this is for disable filter (search box)    
+        "orderMulti": false, // for disable multiple column at once    
+        "ajax": {
+            "url": "/ManagerPanel/StockCheck",
+            "type": "POST",
+            "datatype": "json"
+        },
+        "columnDefs": [
+            {
+                "targets": "_all",
+                "className": "text-center",
+            },
+            {
+                "targets": [4],
+                "orderable": false,
+            },
+        ],
+        "columns": [
+            { "data": "name", "name": "Name", "autoWidth": true },
+            { "data": "stockWarning", "name": "Stock Warning", "autoWidth": true },
+            { "data": "sellingPrice", "name": "SellingPrice", "autoWidth": true },
+            { "data": "stock", "name": "Stock", "autoWidth": true },
+            {
+                "render": function (data, type, full, meta) { return '<a class="btn btn-info" href="ManagerPanel/ProductDetails?productId=' + full.id + '">Details</a>'; }
+            },
+        ]
+
+    });
+
+</script>
+

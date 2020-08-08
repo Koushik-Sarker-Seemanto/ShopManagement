@@ -137,6 +137,60 @@ namespace WebService.Controllers
                 return BadRequest("Exception occured");
             }
         }
+        public IActionResult StockCheck()
+        {
+            try
+            {
+                var draw = HttpContext.Request.Form["draw"].FirstOrDefault();
+                // Skiping number of Rows count  
+                var start = Request.Form["start"].FirstOrDefault();
+                // Paging Length 10,20  
+                var length = Request.Form["length"].FirstOrDefault();
+                // Sort Column Name  
+                var sortColumn = Request.Form["columns[" + Request.Form["order[0][column]"].FirstOrDefault() + "][name]"].FirstOrDefault();
+                logger.LogInformation($"sortColumn: {sortColumn}");
+                // Sort Column Direction ( asc ,desc)  
+                var sortColumnDirection = Request.Form["order[0][dir]"].FirstOrDefault();
+                logger.LogInformation($"sortColumnDirection: {sortColumnDirection}");
+                // Search Value from (Search box)  
+                var searchValue = Request.Form["search[value]"].FirstOrDefault();
+
+                //Paging Size (10,20,50,100)  
+                int pageSize = length != null ? Convert.ToInt32(length) : 0;
+                int skip = start != null ? Convert.ToInt32(start) : 0;
+                int recordsTotal = 0;
+
+                // Getting all Customer data
+                var productData = _managerPanelService.GetAllStockEnd();
+
+                //productData = productData.AsQueryable().Where(d=>d.StockWarning>=d.Stock);
+
+                //Sorting
+                if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
+                {
+                    productData = productData.OrderBy(sortColumn + " " + sortColumnDirection);
+                }
+                //Search
+                if (!string.IsNullOrEmpty(searchValue))
+                {
+                    productData = productData.Where(m => m.Name.ToUpper().Contains(searchValue.ToUpper()));
+                }
+
+                //total number of rows count   
+                recordsTotal = productData.Count();
+                //Paging   
+                var data = productData.Skip(skip).Take(pageSize).ToList();
+                logger.LogInformation($"Data: {JsonConvert.SerializeObject(data)}");
+                //Returning Json Data  
+                return Json(new { draw = draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = data });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Products Endpoint Failed: {ex.Message}");
+                return BadRequest("Exception occured");
+            }
+        }
+
         [HttpGet]
         public async Task<IActionResult> ProductDetails(string productId)
         {
@@ -144,8 +198,11 @@ namespace WebService.Controllers
             
             return View(product);
         }
+        public async Task<IActionResult> StockRemaining()
+        {
+            return View();
+        }
 
-        
         public async Task<IActionResult> GenerateBarcode(string productId, int stock, double buyingPrice)
         {
             logger.LogInformation($" ---------------------------- {stock} ------------ {productId}");

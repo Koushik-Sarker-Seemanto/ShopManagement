@@ -61,7 +61,7 @@
         ],
         "columns": [
             { "data": "name", "name": "Name", "autoWidth": true },
-            { "data": "buyingPrice", "name": "BuyingPrice", "autoWidth": true },
+            { "data": "stockWarning", "name": "Stock Warning", "autoWidth": true },
             { "data": "sellingPrice", "name": "SellingPrice", "autoWidth": true },
             { "data": "stock", "name": "Stock", "autoWidth": true },
             {

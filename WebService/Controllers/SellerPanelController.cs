@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +36,9 @@ namespace WebService.Controllers
                 if (res != null)
                 {
                     Debug.Print("a " +res.ProductTitle );
-                    
+                    if(res.Sold)
+                        return Json(new { res = res, status = "Sold" });
+
                     return Json(new {res = res, status = "Found"});
                 }
             }
@@ -51,7 +55,7 @@ namespace WebService.Controllers
             logger.LogInformation($"Orderssssssssssss: {JsonConvert.SerializeObject(order)}");
             logger.LogInformation($"nameeeeeeeeeeee: {JsonConvert.SerializeObject(name)}");
             logger.LogInformation($"Phoneeeeeeeeeeee: {JsonConvert.SerializeObject(phone)}");
-            return Json(new {status = "Fail"});
+            return Json(ne
 
         }
     }
