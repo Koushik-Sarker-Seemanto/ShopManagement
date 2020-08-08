@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Models.ViewModels.SellerPanel;
 using Newtonsoft.Json;
 using Services.Contracts;
@@ -14,9 +15,11 @@ namespace WebService.Controllers
     public class SellerPanelController : Controller
     {
         private ISellerPanelService _sellerPanelService;
-        public SellerPanelController(ISellerPanelService sellerPanelService)
+        private ILogger<SellerPanelController> logger;
+        public SellerPanelController(ISellerPanelService sellerPanelService, ILogger<SellerPanelController> logger)
         {
             _sellerPanelService = sellerPanelService;
+            this.logger = logger;
         }
         // GET
         public IActionResult Index()
@@ -46,61 +49,13 @@ namespace WebService.Controllers
         [HttpPost]
         public async Task<IActionResult> SellProduct()
         {
-            var orders = Request.Form["order"];
-            var order = JsonConvert.DeserializeObject<string[]>(orders);
-            var name = Request.Form["name"].ToString();
-            var phone = Request.Form["phone"].ToString();
-            var paystatus = Request.Form["pay"].ToString();
-            var totals = Request.Form["total"].ToString();
-            var discouts = Request.Form["discount"].ToString();
-            var total = int.Parse(totals);
-            var discout = int.Parse(discouts);
-            var lst = new List<string>();
-            Debug.Print(order.Length+"aaa");
-            for(int i = 0 ;i<order.Length;i++)
-                lst.Add(order[i]);
-
-            if (lst.Count <= 0)
-            {
-                return Json(new { status = "Fail" });
-            }
-
-            var orderModel = new OrderViewModel
-            { 
-                Order = lst,
-                Name = name,
-                Phone = phone,
-                Amount = total,
-                Discount = discout
-            };
-
-            if (paystatus != null)
-            {
-
-                if (paystatus == "Due")
-                {
-                    orderModel.Paid = false;
-                }
-                else
-                {
-                    orderModel.Paid = true;
-                }
-            }
-            else
-            {
-                // Error
-            }
-
-            Debug.Print(orderModel.Name + " " + orderModel.Amount +" "+ orderModel.Paid.ToString() + " " + orderModel.Phone);
-            var orderRes = await _sellerPanelService.MakeOrder(orderModel);
-            if (orderRes == null)
-            {
-                return Json(new { status = "Fail" });
-            }
-
-            return Json(new { status = "Ok" });
-
-
+            var order = Request.Form["order"].ToArray();
+            var name = Request.Form["name"].ToArray();
+            var phone = Request.Form["phone"].ToArray();
+            logger.LogInformation($"Orderssssssssssss: {JsonConvert.SerializeObject(order)}");
+            logger.LogInformation($"nameeeeeeeeeeee: {JsonConvert.SerializeObject(name)}");
+            logger.LogInformation($"Phoneeeeeeeeeeee: {JsonConvert.SerializeObject(phone)}");
+            return Json(ne
 
         }
     }
