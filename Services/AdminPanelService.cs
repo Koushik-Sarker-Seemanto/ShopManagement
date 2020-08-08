@@ -86,6 +86,12 @@ namespace Services
             }
         }
 
+        public async Task<List<Product>> GetAllProducts(string search)
+        {
+            var items = await _repository.GetItemsAsync<Product>(d => d.Name.Contains(search));
+            return items.ToList();
+        }
+
         private async Task<List<User>> GetAllSeller()
         {
             try
