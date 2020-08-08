@@ -55,11 +55,10 @@
 
     //751f5413-abe1-4624-b646-a2d67c87a8bc
     //0bb55003-b095-44af-af58-db5c6f1c7a7a
-    var array = [];
     $('#inbox').keyup(function(e) {
         if (e.keyCode == 13) {
             //your code
-            var str = $("#inbox").val();
+            let productId = $("#inbox").val();
 
             $.ajax({
                 type: "GET",
@@ -67,7 +66,7 @@
                 contentType: "application/json; charset=utf-8",
                 data: {
                     //Passing Input parameter
-                    id: $('#inbox').val()
+                    id: productId
                 },
                 success: function (response) {
                     var json_response = JSON.stringify(response);
@@ -76,11 +75,24 @@
                     if (response.status === "Not Found") {
                         alert("Product Not Found");
                     } else {
-                        var trHTML = '';
-                        trHTML += '<tr class="eachItem"><td class="text-center productName">' + response.res.productTitle + '</td><td class="text-center productPrice">' + response.res.sellingPrice + '</td><td class="text-center"><button onclick="javascript: removeRow(this)" class="deleteIcon btn btn-danger">Remove</button></td></tr>';
-                        $('#productToBeSold').append(trHTML);
-                        array.push(response.res.id);
-                        $('#total').text(getTotalPrice());
+                        let exist = false;
+                        $('tr.eachItem').each(function() {
+                            let id = $(this).attr('id');
+                            if (id === response.res.id){
+                                exist = true;
+                            }
+                        });
+                        if (exist === false){
+                            var trHTML = '';
+                            trHTML += '<tr class="eachItem" id="'+response.res.id+'"><td class="text-center productName">' + response.res.productTitle + '</td><td class="text-center productPrice">' + response.res.sellingPrice + '</td><td class="text-center"><button onclick="javascript: removeRow(this)" class="deleteIcon btn btn-danger">Remove</button></td></tr>';
+                            $('#productToBeSold').append(trHTML);
+                            //array.push(response.res.id);
+                            $('#total').text(getTotalPrice());
+                            $('#due').text(getDue());
+                        }
+                        else {
+                            alert("Product Already Added");
+                        }
                     }
                 },
                 error: function (response) {
@@ -94,20 +106,36 @@
     $('#discount').keyup(function(e) {
         if (e.keyCode == 13) {
             $('#total').text(getTotalPrice());
+            $("#due").text(getDue());
         }
+    });
+    
+    $('#discount').on('input', function() {
+        $('#total').text(getTotalPrice());
+        $("#due").text(getDue());
+    });
+    
+    $('#payment').on('input', function() {
+        $("#due").text(getDue());
     });
 
     function removeRow(e) {
         $(e).closest('tr').remove();
         let price = getTotalPrice();
         $("#total").text(price);
+        $("#due").text(getDue());
     }
 
     $('#checkout').click(function () {
         $('#total').text(getTotalPrice());
-        createInvoice();
+        $("#due").text(getDue());
         
-        console.log(array.length);
+        let array = [];
+        $('tr.eachItem').each(function() {
+            let id = $(this).attr('id');
+            array.push(id);
+        });
+        //console.log(array.length);
         $.ajax({
             type: "POST",
             url: '@Url.Action("SellProduct", "SellerPanel")',
@@ -116,11 +144,16 @@
                 //Passing Input parameter
                 name: $('#name').val(),
                 phone: $('#phone').val(),
+                totalAmount: getTotalPrice(),
+                discount: $("#discount").val(),
+                due: getDue(),
                 order: JSON.stringify(array)
             },
             success: function (response) {
-                if (response.status === "Ok") {
+                if (response.status === "Success") {
+                    $("#showInvoice").attr('name', response.orderId);
                     alert("OK");
+                    createInvoice();
                 } else {
                     alert("Fail");
                 }
@@ -130,6 +163,11 @@
             }
         });
     });
+    function getDue() {
+        let totalPrice = getTotalPrice();
+        let payment = $("#payment").val();
+        return (parseFloat(totalPrice) - parseFloat(payment)).toFixed(1);
+    }
     function getTotalPrice() {
         let totalPrice = 0.00;
         $('tr.eachItem').each(function() {
@@ -150,7 +188,6 @@
 
     function createInvoice() {
         let productList = [];
-        let totalPrice = 0.00;
         let buyerName = $("#name").val();
         let buyerPhone = $("#phone").val();
         if (buyerName === "" || buyerName === undefined){
@@ -159,9 +196,11 @@
         if (buyerPhone === "" || buyerPhone === undefined){
             buyerPhone = "N/A";
         }
+        let orderId = $("#showInvoice").attr('name');
         
         let domStart = `<div id="invoice-content" class="m-auto" style="width: 400px; background: white">
-                            <h1 class="d-flex justify-content-center" style="color: green">Invoice</h1><hr>
+                            <h1 class="d-flex justify-content-center" style="color: green">Invoice</h1>
+                            <p class="d-flex justify-content-center" >OrderId: ${orderId}</p><hr>
                             <p id="name" class="list-group-item">Customer Name: ${buyerName}</p>
                             <p id="name" class="list-group-item">Customer Phone: ${buyerPhone}</p>
                             <br>
@@ -172,7 +211,6 @@
         $('tr.eachItem').each(function() {
             let name = $(this).find('td.productName').text();
             let price = $(this).find('td.productPrice').text();
-            totalPrice = (parseFloat(totalPrice) + parseFloat(price)).toFixed(1);
             let quantity = 1;
             for( let i = 0; i < productList.length; i++){
                 let prodName = productList[i].productName;
@@ -194,10 +232,14 @@
         }
         
         let discount = $("#discount").val();
-        totalPrice = (parseFloat(totalPrice) - parseFloat(discount)).toFixed(1);
+        let totalPrice = getTotalPrice();
+        let due = getDue();
+        let payment = $('#payment').val();
         
         let domEnd =        `<tr style="background: #eeeeee"><td colspan="3" class="text-right">Discount $</td><td>${discount}</td></tr>
                              <tr style="background: #eeeeee"><td colspan="3" class="text-right">Total Price $</td><td>${totalPrice}</td></tr>
+                             <tr style="background: #eeeeee"><td colspan="3" class="text-right">Payment $</td><td>${payment}</td></tr>
+                             <tr style="background: #eeeeee"><td colspan="3" class="text-right">Due $</td><td>${due}</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -211,13 +253,6 @@
 
     function downloadPDF() {
         var doc = new jsPDF('p', 'mm', [105.83, 296]);
-        var str = `<h1 style='color: red'>Invoice</h1>             
-                    <br>
-                    <h3> Buyer Name: ${$("#name").val()}
-                    <br>
-                    <h3> Buyer PhoneNo: ${$("#phone").val()}
-                    <br>
-                    <h3>Total Price: ${$("#total").val()}</h3>`;
         
         doc.addHTML(document.getElementById('invoice-content'), function() {
             //doc.save('invoice.pdf');

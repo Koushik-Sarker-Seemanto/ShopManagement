@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -42,17 +44,58 @@ namespace WebService.Controllers
             return Json(new {status = "Not Found" });
         }
 
+        //This endpoint is temporary for easy testing purpose.
+        [HttpGet]
+        public async Task<IActionResult> TempProductList()
+        {
+            var response = _sellerPanelService.GetAllProducts();
+            return View(response);
+        }
+
         [HttpPost]
         public async Task<IActionResult> SellProduct()
         {
-            var order = Request.Form["order"].ToArray();
-            var name = Request.Form["name"].ToArray();
-            var phone = Request.Form["phone"].ToArray();
-            logger.LogInformation($"Orderssssssssssss: {JsonConvert.SerializeObject(order)}");
-            logger.LogInformation($"nameeeeeeeeeeee: {JsonConvert.SerializeObject(name)}");
-            logger.LogInformation($"Phoneeeeeeeeeeee: {JsonConvert.SerializeObject(phone)}");
-            return Json(new {status = "Fail"});
+            try
+            {
+                var orderData = Request.Form["order"];
+                var order = JsonConvert.DeserializeObject<List<string>>(orderData);
+                var name = Request.Form["name"].ToString();
+                var phone = Request.Form["phone"].ToString();
+                var discount = Request.Form["discount"].ToString();
+                var totalPrice = Request.Form["totalAmount"].ToString();
+                var due = Request.Form["due"].ToString();
+                logger.LogInformation($"Orderssssssssssss: {JsonConvert.SerializeObject(order)}");
+                logger.LogInformation($"nameeeeeeeeeeee: {name}");
+                logger.LogInformation($"Phoneeeeeeeeeeee: {phone}");
+                logger.LogInformation($"Dsicounttttttttt: {discount}");
+                logger.LogInformation($"totalpriceeeeeeeeee: {totalPrice}");
+                logger.LogInformation($"dueeeeeeeeeeeeee: {due}");
+                OrderViewModel model = new OrderViewModel();
+                
+                model.Discount = Double.Parse(discount);
+                model.TotalPrice = Double.Parse(totalPrice);
+                model.DueAmount = Double.Parse(due);
+                var products = new List<string>();
+                foreach (var item in order)
+                {
+                    products.Add(item);
+                    logger.LogInformation($"ProductttttttttttttttId: {item}");
+                }
 
+                model.Order = products;
+            
+                var response = await _sellerPanelService.SellProduct(model);
+                if (response != null && !string.IsNullOrEmpty(response.Id))
+                {
+                    return Json(new {status = "Success", orderId = response.Id});
+                }
+                return Json(new {status = "Fail"});
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"SellProduct Endpoint Failed: {ex.Message}");
+                return Json(new {status = "Fail"});
+            }
         }
     }
 }
