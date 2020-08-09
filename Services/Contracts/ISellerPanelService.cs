@@ -10,8 +10,7 @@ namespace Services.Contracts
     public interface ISellerPanelService
     {
         public Task<ProductSellViewModel> GetProductFromBar(string id);
-        public Task<Order> MakeOrder(OrderViewModel order);
-
-
+        public Task<Order> SellProduct(OrderViewModel model);
+        public List<IndividualProduct> GetAllProducts();
     }
 }

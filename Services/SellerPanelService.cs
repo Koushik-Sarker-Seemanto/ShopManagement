@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Collections.Specialized;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Models.Entities;
 using Models.ManagerPanelModels;
 using Models.ViewModels.AdminPanel;
@@ -14,12 +16,12 @@ namespace Services
 {
     public class SellerPanelService : ISellerPanelService
     {
-        private readonly IManagerPanelService _managerPanelService;
         private readonly IMongoRepository _repository;
-        public SellerPanelService(IManagerPanelService managerPanelService,IMongoRepository repository)
+        private readonly ILogger<SellerPanelService> logger;
+        public SellerPanelService(IMongoRepository repository, ILogger<SellerPanelService> logger)
         {
-            _managerPanelService = managerPanelService;
             _repository = repository;
+            this.logger = logger;
         }
 
         public async Task<ProductSellViewModel> GetProductFromBar(string id)
@@ -27,41 +29,17 @@ namespace Services
             ProductSellViewModel resProduct = null;
             if (id != null)
             {
-                var indevidualProduct = await _repository.GetItemAsync<IndividualProduct>(d => d.Id == id);
+                var indevidualProduct = await _repository.GetItemAsync<IndividualProduct>(d => d.Id == id && d.Sold == false);
                 if (indevidualProduct != null)
                 {
-
-                    var Mainproduct = await _managerPanelService.FindProductById(indevidualProduct.CategoryId);
-                    if (Mainproduct != null)
+                    var product = await _repository.GetItemAsync<Product>(d => d.Id == indevidualProduct.CategoryId);
+                    if (product != null)
                     {
-                        if (Mainproduct.Stock <= 0)
-                        {
-                            return null;
-                        }
-                    }
-                    if (indevidualProduct != null)
-                    {
-                        var product = await _repository.GetItemAsync<Product>(d => d.Id == indevidualProduct.CategoryId);
-                        if (product != null)
-                        {
-                            resProduct = new ProductSellViewModel();
-                            resProduct.Id = indevidualProduct.Id;
-                            resProduct.ProductTitle = product.Name;
-                            resProduct.SellingPrice = product.SellingPrice;
-                            resProduct.Sold = false;
-                            
-                            Debug.Print(indevidualProduct.SoldAt.Year + "Day OF YEAR");
-                            if (indevidualProduct.SoldAt != null)
-                            {
-                                if (indevidualProduct.SoldAt.Year > 2000)
-                                {
-                                    resProduct.Sold = true;
-                                }
-                            }
-
-
-                            return resProduct;
-                        }
+                        resProduct = new ProductSellViewModel();
+                        resProduct.Id = indevidualProduct.Id;
+                        resProduct.ProductTitle = product.Name;
+                        resProduct.SellingPrice = product.SellingPrice;
+                        return resProduct;
                     }
                 }
             }
@@ -69,65 +47,64 @@ namespace Services
             return null;
         }
 
-
-        public async Task<Order> MakeOrder(OrderViewModel order)
+        public async Task<Order> SellProduct(OrderViewModel model)
         {
-            var id = Guid.NewGuid().ToString();
-            var orderModel = new Order
+            try
             {
-                Id = id,
-                Name = order.Name,
-                Phone = order.Phone,
-                Amount = order.Amount,
-                Paid    = order.Paid,
-                Discount = order.Discount
-            };
-            
-            var list = await GetIndividualProducts(order.Order);
-            if (list == null) return null;
-            orderModel.Products = list;
-            await _repository.SaveAsync<Order>(orderModel);
-            await UpdateIndividualProduct(orderModel.Products);
-            return orderModel;
-        }
-
-        public async Task<List<IndividualProduct>> GetIndividualProducts(List<string> ids)
-        {
-            var list = new List<IndividualProduct>();
-            foreach (var id in ids)
-            {
-                Debug.Print(id);
-                var indiPro = await _repository.GetItemAsync<IndividualProduct>(d => d.Id == id);
-                if (indiPro != null)
+                if (model?.Order != null && model.Order.Count > 0)
                 {
-                    list.Add(indiPro);
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            return list;
-        }
-
-        public async Task UpdateIndividualProduct(List<IndividualProduct> product)
-        {
-            if (product != null)
-            {
-                foreach (var singleProduct in product)
-                {
-                    if (singleProduct != null)
+                    foreach (var item in model.Order)
                     {
-                        singleProduct.Sold = true;
-                        singleProduct.SoldAt = DateTime.Now;
-                        await _managerPanelService.StockReduce(singleProduct.CategoryId);
-                        await _repository.UpdateAsync<IndividualProduct>(d => d.Id == singleProduct.Id, singleProduct);
-
+                        var individualProduct = await _repository.GetItemAsync<IndividualProduct>(d => d.Id == item && d.Sold == false);
+                        if (individualProduct != null)
+                        {
+                            individualProduct.Sold = true;
+                            individualProduct.SellDateTime = DateTime.Now;
+                            await _repository.UpdateAsync<IndividualProduct>(
+                                e => e.Id == individualProduct.Id, individualProduct);
+                        }
+                        else
+                        {
+                            return null;
+                        }
                     }
+
+                    var orderId = Guid.NewGuid().ToString();
+                    Order order = new Order
+                    {
+                        Id = orderId,
+                        CustomerName = model.Name,
+                        CustomerPhone = model.Phone,
+                        Products = model.Order,
+                        Discount = model.Discount,
+                        DueAmount = model.DueAmount,
+                        TotalPrice = model.TotalPrice,
+                    };
+                    await _repository.SaveAsync<Order>(order);
+                    return order;
                 }
 
+                return null;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"SellProduct Failed: {ex.Message}");
+                return null;
             }
         }
 
+        public List<IndividualProduct> GetAllProducts()
+        {
+            try
+            {
+                var result =  _repository.GetItems<IndividualProduct>().ToList();
+                return result;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"GetAllProduces Failed: {ex.Message}");
+                return null;
+            }
+        }
     }
 }
