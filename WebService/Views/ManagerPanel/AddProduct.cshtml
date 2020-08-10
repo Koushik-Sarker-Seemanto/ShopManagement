@@ -25,6 +25,15 @@
                             <span asp-validation-for="SellingPrice" class="text-danger"></span>
                         </div>
                         <div class="form-group">
+                            <label class="small mb-1" for="type">Product Type</label>
+                            <select asp-for="ProductType" class="form-control py--4" id="type">
+                                <option disabled selected value=""> -- Please Select -- </option>
+                                <option value="Barcode">Barcode</option>
+                                <option value="NonBarcode">Non-Barcode</option>
+                            </select>
+                            <span asp-validation-for="ProductType" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
                             <label class="small mb-1" for="buyingPrice">Stock Empty Warning</label>
                             <input asp-for="StockWarning" class="form-control py-4" id="buyingPrice" placeholder="Enter Warning Amount( Stock Empty Warning)">
                             <span asp-validation-for="StockWarning" class="text-danger"></span>

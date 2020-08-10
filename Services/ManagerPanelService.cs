@@ -38,6 +38,7 @@ namespace Services
                         StockWarning = model.StockWarning,
                         SellingPrice = model.SellingPrice,
                         Details = model.Details,
+                        ProductType = model.ProductType,
                     };
                     await _repository.SaveAsync<Product>(product);
                     return product;
