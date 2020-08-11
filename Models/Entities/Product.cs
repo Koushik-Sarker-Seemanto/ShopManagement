@@ -12,6 +12,8 @@ namespace Models.Entities
         public string Name { get; set; }
         [BsonRequired]
         public double SellingPrice { get; set; }
+
+        public string ProductType { get; set; }
         
         public int Stock { get; set; } = 0;
         public int StockWarning { get; set; } = 0;

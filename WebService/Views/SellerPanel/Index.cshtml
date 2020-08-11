@@ -18,9 +18,24 @@
         <i class="fas fa-caret-down float-right"></i>
     </div>
     <div class="card-body">
-        <div class="form-group">
-            <label class="mb-1" for="inbox">Product</label>
-            <input class="form-control" placeholder="Product Id" id="inbox" />
+        <div class="form-row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="mb-1" for="inbox">Barcode Product</label>
+                    <input class="form-control" placeholder="Product Id" id="inbox" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="mb-1" for="inbox-non-barcode">Non Barcode Product</label>
+                    <input class="form-control autocomplete" placeholder="Product Name" id="inbox-non-barcode" />
+                </div>
+                <div class="form-group">
+                    <label class="mb-1" for="inbox-non-amount">Non Barcode Amount</label>
+                    <input class="form-control" placeholder="Unit" value="1" id="inbox-non-amount" />
+                </div>
+                <button id="add-non-bar" class="btn btn-primary">Add</button>
+            </div>
         </div>
         <div class="form-row">
             <div class="col-md-6">
@@ -53,6 +68,80 @@
 
 <script>
 
+    $(function() {
+        $("#inbox-non-barcode").autocomplete({
+            source: function(request, cb) {
+                $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("GetProductByName", "SellerPanel")',
+                    contentType: "application/json; charset=utf-8",
+                    data: {
+                        query: request.term,
+                    },
+                    success: function(response) {
+                        if (response.status === "Not Found"){
+                            console.log("List Not Found");
+                        }
+                        else {
+                            cb($.map( JSON.parse(response.res), function( item ) {
+                                return {
+                                  label: item,
+                                  value: item
+                                }
+                            }));
+                        }
+                    },
+                    error: function() {
+                        console.log("Error!!! List Not Found")
+                    },
+                });
+            }
+        });
+    });
+
+    $("#add-non-bar").click(function() {
+        let productName = $("#inbox-non-barcode").val();
+        let amount = $("#inbox-non-amount").val();
+        if (productName === "" || productName === undefined){
+            alert("Invalid Product Name");
+            return false;
+        }
+        if (amount === "" || amount === undefined){
+            alert("Invalid Amount");
+            return false;
+        }
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetProductNonBarCode", "SellerPanel")',
+            contentType: "application/json; charset=utf-8",
+            data: {
+                //Passing Input parameter
+                name: productName,
+                quantity: amount,
+            },
+            success: function (response) {
+                var json_response = JSON.stringify(response);
+
+                $('#inbox-non-barcode').val('');
+                $('#inbox-non-amount').val('1');
+                if (response.status === "Not Found") {
+                    alert("Product Not Found");
+                }
+                else {
+                    var trHTML = '';
+                    trHTML += '<tr class="eachItem" type="non-bar" id="'+response.res.id+'"><td class="text-center productName">' + response.res.productTitle + '</td><td class="text-center amountSelect">'+amount+'</td><td class="text-center productPrice">' + response.res.sellingPrice + '</td><td class="text-center">'+ (parseFloat(response.res.sellingPrice) * parseFloat(amount)).toFixed(1) +'</td><td class="text-center"><button onclick="javascript: removeRow(this)" class="deleteIcon btn btn-danger">Remove</button></td></tr>';
+                    $('#productToBeSold').append(trHTML);
+                    //array.push(response.res.id);
+                    $('#total').text(getTotalPrice());
+                    $('#due').text(getDue());
+                }
+            },
+            error: function (response) {
+                alert(response);
+            }
+        });
+    });
+
     //751f5413-abe1-4624-b646-a2d67c87a8bc
     //0bb55003-b095-44af-af58-db5c6f1c7a7a
     $('#inbox').keyup(function(e) {
@@ -84,7 +173,7 @@
                         });
                         if (exist === false){
                             var trHTML = '';
-                            trHTML += '<tr class="eachItem" id="'+response.res.id+'"><td class="text-center productName">' + response.res.productTitle + '</td><td class="text-center productPrice">' + response.res.sellingPrice + '</td><td class="text-center"><button onclick="javascript: removeRow(this)" class="deleteIcon btn btn-danger">Remove</button></td></tr>';
+                            trHTML += '<tr class="eachItem" type="bar" id="'+response.res.id+'"><td class="text-center productName">' + response.res.productTitle + '</td><td class="text-center amountSelect">1</td><td class="text-center productPrice">' + response.res.sellingPrice + '</td><td class="text-center">'+ response.res.sellingPrice +'</td><td class="text-center"><button onclick="javascript: removeRow(this)" class="deleteIcon btn btn-danger">Remove</button></td></tr>';
                             $('#productToBeSold').append(trHTML);
                             //array.push(response.res.id);
                             $('#total').text(getTotalPrice());
@@ -131,10 +220,24 @@
         $("#due").text(getDue());
         
         let array = [];
+        let nonArray = [];
         $('tr.eachItem').each(function() {
-            let id = $(this).attr('id');
-            array.push(id);
+            let check = $(this).attr('type');
+            if (check === "non-bar"){
+                let id = $(this).attr('id');
+                let amount = $(this).find('.amountSelect').text();
+                let nonBar = {
+                    "ItemId": id,
+                    "Amount": amount,
+                };
+                nonArray.push(nonBar)
+            }
+            else{
+                let id = $(this).attr('id');
+                array.push(id);
+            }
         });
+        alert(JSON.stringify(nonArray));
         //console.log(array.length);
         $.ajax({
             type: "POST",
@@ -147,7 +250,8 @@
                 totalAmount: getTotalPrice(),
                 discount: $("#discount").val(),
                 due: getDue(),
-                order: JSON.stringify(array)
+                order: JSON.stringify(array),
+                orderNonBar: JSON.stringify(nonArray),
             },
             success: function (response) {
                 if (response.status === "Success") {
@@ -209,17 +313,26 @@
                                 <tbody>`;
         let row = '';
         $('tr.eachItem').each(function() {
-            let name = $(this).find('td.productName').text();
-            let price = $(this).find('td.productPrice').text();
-            let quantity = 1;
-            for( let i = 0; i < productList.length; i++){
-                let prodName = productList[i].productName;
-                if(prodName === name){
-                    quantity += 1;
-                    productList[i].productQuantity += parseInt(1);
+            let type =  $(this).attr('type');
+            if (type ==="bar"){
+                let name = $(this).find('td.productName').text();
+                let price = $(this).find('td.productPrice').text();
+                let quantity = 1;
+                for( let i = 0; i < productList.length; i++){
+                    let prodName = productList[i].productName;
+                    if(prodName === name){
+                        quantity += 1;
+                        productList[i].productQuantity += parseInt(1);
+                    }
+                }
+                if (quantity === 1){
+                    productList.push({productName: name, productPrice: price, productQuantity: quantity});
                 }
             }
-            if (quantity === 1){
+            else{
+                let name = $(this).find('td.productName').text();
+                let price = $(this).find('td.productPrice').text();
+                let quantity = $(this).find('td.amountSelect').text();
                 productList.push({productName: name, productPrice: price, productQuantity: quantity});
             }
         });

@@ -47,17 +47,85 @@ namespace Services
             return null;
         }
 
+        public async Task<ProductSellViewModel> GetProductNonBar(string name, string quantity)
+        {
+            try
+            {
+                var result = await _repository.GetItemAsync<Product>(e => e.Name == name && e.ProductType == "NonBarcode");
+                if (result != null)
+                {
+                    if (result.Stock < Double.Parse(quantity))
+                    {
+                        return null;
+                    }
+                    ProductSellViewModel response = new ProductSellViewModel()
+                    {
+                        Id = result.Id,
+                        ProductTitle = result.Name,
+                        SellingPrice = result.SellingPrice,
+                    };
+                    return response;
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"GetProductNonBar Failed: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<List<string>> GetProductByName(string query)
+        {
+            try
+            {
+                var result = _repository.GetItems<Product>(e => e.Name.ToUpper().Contains(query.ToUpper()) && e.ProductType == "NonBarcode");
+                return result?.Select(e => e.Name).ToList();
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"GetProductByName Failed: {ex.Message}");
+                return null;
+            }
+        }
+
         public async Task<Order> SellProduct(OrderViewModel model)
         {
             try
             {
-                if (model?.Order != null && model.Order.Count > 0)
+                if (model?.OrderNonBar != null)
+                {
+                    foreach (var item in model.OrderNonBar)
+                    {
+                        var product = await _repository.GetItemAsync<Product>(e => e.Id.Equals(item.ItemId));
+                        if (product != null)
+                        {
+                            product.Stock = product.Stock - item.Amount;
+                            await _repository.UpdateAsync<Product>(
+                                e => e.Id == product.Id, product);
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                }
+                if (model?.Order != null)
                 {
                     foreach (var item in model.Order)
                     {
                         var individualProduct = await _repository.GetItemAsync<IndividualProduct>(d => d.Id == item && d.Sold == false);
                         if (individualProduct != null)
                         {
+                            var product =
+                                await _repository.GetItemAsync<Product>(e => e.Id.Equals(individualProduct.CategoryId));
+                            if (product != null)
+                            {
+                                product.Stock = product.Stock - 1;
+                                await _repository.UpdateAsync<Product>(
+                                    e => e.Id == product.Id, product);
+                            }
                             individualProduct.Sold = true;
                             individualProduct.SellDateTime = DateTime.Now;
                             await _repository.UpdateAsync<IndividualProduct>(
@@ -68,7 +136,10 @@ namespace Services
                             return null;
                         }
                     }
+                }
 
+                if (model?.Order != null || model?.OrderNonBar != null)
+                {
                     var orderId = Guid.NewGuid().ToString();
                     Order order = new Order
                     {
@@ -76,6 +147,7 @@ namespace Services
                         CustomerName = model.Name,
                         CustomerPhone = model.Phone,
                         Products = model.Order,
+                        ProductNonBar = model.OrderNonBar,
                         Discount = model.Discount,
                         DueAmount = model.DueAmount,
                         TotalPrice = model.TotalPrice,
@@ -83,7 +155,6 @@ namespace Services
                     await _repository.SaveAsync<Order>(order);
                     return order;
                 }
-
                 return null;
             }
             catch (Exception ex)

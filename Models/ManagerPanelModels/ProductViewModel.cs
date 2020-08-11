@@ -7,6 +7,8 @@ namespace Models.ManagerPanelModels
         public string Id { get; set; }
         [Required]
         public string Name { get; set; }
+
+        public string ProductType { get; set; }
         [Required]
         public double SellingPrice { get; set; }
         
