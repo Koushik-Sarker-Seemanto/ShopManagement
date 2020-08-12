@@ -1,0 +1,18 @@
+﻿@model Models.SellerPanelModels.ProductIdInput
+@{
+    ViewData["Title"] = "SearchProduct";
+    Layout = "_LayoutSeller";
+}
+
+<h1>SearchProduct</h1>
+@Html.ValidationSummary(true, "", new { @class = "text-danger alert alert-danger" })
+<form asp-action="SearchProduct" class="" autocomplete="off">
+    <div class="form-group">
+        <label class="small mb-1" for="name">Product Id</label>
+        <input asp-for="ProductId" class="form-control py-4" id="name" type="text" placeholder="Enter Product Id">
+        <span asp-validation-for="ProductId" class="text-danger"></span>
+    </div>
+    <div class="form-group mt-4 mb-0"><button type="submit" class="customBtn-admin-primary text-white btn-block border-0">Add Product</button></div>
+
+
+</form>

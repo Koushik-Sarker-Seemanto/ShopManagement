@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Models.Entities;
+using Models.SellerPanelModels;
 using Models.ViewModels.SellerPanel;
 
 namespace Services.Contracts
@@ -14,5 +15,6 @@ namespace Services.Contracts
         public Task<List<string>> GetProductByName(string query);
         public Task<Order> SellProduct(OrderViewModel model);
         public List<IndividualProduct> GetAllProducts();
+        public  Task<ProductDetails> GetAllDetail(ProductIdInput product);
     }
 }

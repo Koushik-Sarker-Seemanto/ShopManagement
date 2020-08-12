@@ -97,12 +97,17 @@ namespace WebService.Controllers
                 // Getting all Customer data
                 var productData = _adminPanelService.GetAllDueOrders();
 
-                //Sorting
+
+
+                /// Todo: Sorting
+                /// 
+
+                // Sorting
                 // if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
                 // {
                 //     productData = productData.OrderBy(sortColumn + " " + sortColumnDirection);
                 // }
-                //Search
+                // Search
                 if (!string.IsNullOrEmpty(searchValue))
                 {
                     productData = productData.Where(m => m.CustomerName.ToUpper().Contains(searchValue.ToUpper()));

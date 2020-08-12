@@ -4,9 +4,11 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.Logging;
 using Models.Entities;
 using Models.ManagerPanelModels;
+using Models.SellerPanelModels;
 using Models.ViewModels.AdminPanel;
 using Models.ViewModels.SellerPanel;
 using Repositories;
@@ -94,6 +96,7 @@ namespace Services
         {
             try
             {
+                var orderId = Guid.NewGuid().ToString();
                 if (model?.OrderNonBar != null)
                 {
                     foreach (var item in model.OrderNonBar)
@@ -126,6 +129,8 @@ namespace Services
                                 await _repository.UpdateAsync<Product>(
                                     e => e.Id == product.Id, product);
                             }
+
+                            individualProduct.OrderId = orderId;
                             individualProduct.Sold = true;
                             individualProduct.SellDateTime = DateTime.Now;
                             await _repository.UpdateAsync<IndividualProduct>(
@@ -140,7 +145,7 @@ namespace Services
 
                 if (model?.Order != null || model?.OrderNonBar != null)
                 {
-                    var orderId = Guid.NewGuid().ToString();
+                    
                     Order order = new Order
                     {
                         Id = orderId,
@@ -176,6 +181,35 @@ namespace Services
                 logger.LogError(ex, $"GetAllProduces Failed: {ex.Message}");
                 return null;
             }
+        }
+
+        public async Task<ProductDetails> GetAllDetail(ProductIdInput product)
+        {
+            var indi = await GetIndividualProductById(product.ProductId);
+            var res = new ProductDetails();
+            res.Unit = indi;
+            res.Product = await GetProductById(indi.CategoryId);
+            if (res.Unit.Sold)
+            {
+                res.Order = await GetOrderById(indi.OrderId);
+            }
+
+            return res;
+
+
+        }
+
+        public async Task<IndividualProduct> GetIndividualProductById(string id)
+        {
+            return await _repository.GetItemAsync<IndividualProduct>(d => d.Id == id);
+        }
+        public async Task<Product> GetProductById(string id)
+        {
+            return await _repository.GetItemAsync<Product>(d => d.Id == id);
+        }
+        public async Task<Order> GetOrderById(string id)
+        {
+            return await _repository.GetItemAsync<Order>(d => d.Id == id);
         }
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Models.Entities;
+using Models.SellerPanelModels;
 using Models.ViewModels.SellerPanel;
 using Newtonsoft.Json;
 using Services.Contracts;
@@ -141,6 +142,26 @@ namespace WebService.Controllers
                 logger.LogError(ex, $"SellProduct Endpoint Failed: {ex.Message}");
                 return Json(new {status = "Fail"});
             }
+        }
+
+        public async Task<IActionResult> SearchProduct()
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> SearchProduct(ProductIdInput product)
+        {
+            
+            return RedirectToAction("ProductDetails","SellerPanel",new { id = product.ProductId});
+        }
+
+        public async Task<IActionResult> ProductDetails(string id)
+        {
+            var inp = new ProductIdInput();
+            inp.ProductId = id;
+            var model = await _sellerPanelService.GetAllDetail(inp);
+            logger.LogInformation(model.Product.Id+"++++++++++++++++++++++++++");
+            return View(model);
         }
     }
 }

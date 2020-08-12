@@ -162,14 +162,14 @@ namespace WebService.Controllers
 
                 // Getting all Customer data
                 var productData = _managerPanelService.GetAllStockEnd();
+                /// Todo : Query write Correctly
+                productData = productData.AsQueryable().Where(d=>d.StockWarning >d.Stock);
 
-                //productData = productData.AsQueryable().Where(d=>d.StockWarning>=d.Stock);
-
-                //Sorting
-                if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
-                {
-                    productData = productData.OrderBy(sortColumn + " " + sortColumnDirection);
-                }
+                // //Sorting
+                // if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
+                // {
+                //     productData = productData.OrderBy(sortColumn + " " + sortColumnDirection);
+                // }
                 //Search
                 if (!string.IsNullOrEmpty(searchValue))
                 {
