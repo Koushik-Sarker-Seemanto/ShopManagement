@@ -91,6 +91,12 @@ namespace Services
             var items = await _repository.GetItemsAsync<Product>(d => d.Name.Contains(search));
             return items.ToList();
         }
+        public IQueryable<Order> GetAllDueOrders()
+        {
+            var items =  _repository.GetItems<Order>(d=>d.DueAmount > 0.00);
+       
+            return items;
+        }
 
         private async Task<List<User>> GetAllSeller()
         {

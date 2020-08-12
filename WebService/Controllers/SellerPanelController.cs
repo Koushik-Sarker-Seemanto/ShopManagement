@@ -127,7 +127,8 @@ namespace WebService.Controllers
 
                 model.Order = products;
                 model.OrderNonBar = productNonBar;
-            
+                model.Name = name;
+                model.Phone = phone;
                 var response = await _sellerPanelService.SellProduct(model);
                 if (response != null && !string.IsNullOrEmpty(response.Id))
                 {

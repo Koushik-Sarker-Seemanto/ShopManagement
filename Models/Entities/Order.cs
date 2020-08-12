@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace Models.Entities
@@ -17,11 +19,16 @@ namespace Models.Entities
         public double TotalPrice { get; set; }
         public double Discount { get; set; }
         public double DueAmount { get; set; }
+        [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
+        [BsonRepresentation(BsonType.DateTime)]
+        public DateTime SoldAt { get; set; } = DateTime.Now;
     }
 
     public class NonBar
     {
         public string ItemId { get; set; }
         public int Amount { get; set; }
+
+
     }
 }
