@@ -203,6 +203,21 @@ namespace WebService.Controllers
             return View();
         }
 
+        public async Task<IActionResult> RegularCosting()
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> RegularCosting(Cost cost)
+        {
+            if (ModelState.IsValid == false)
+            {
+                return View(cost);
+            }
+            var res = await _managerPanelService.AddCost(cost);
+            return RedirectToAction("Index");
+        }
+
         public async Task<IActionResult> GenerateBarcode(string productId, int stock, double buyingPrice)
         {
             logger.LogInformation($" ---------------------------- {stock} ------------ {productId}");

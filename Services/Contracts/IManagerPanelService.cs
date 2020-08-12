@@ -15,6 +15,7 @@ namespace Services.Contracts
         public Task<Product> UpdateCurrentStock(string productId, int stockAmount, double buyingPrice);
         public  Task<Product> StockReduce(string id);
         public IQueryable<Product> GetAllStockEnd();
+        public Task<Cost> AddCost(Cost cost);
 
 
     }

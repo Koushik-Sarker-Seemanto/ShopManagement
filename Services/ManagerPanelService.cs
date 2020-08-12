@@ -206,6 +206,13 @@ namespace Services
                 return null;
             }
         }
-        
+
+        public async Task<Cost> AddCost(Cost cost)
+        {
+            cost.Id = Guid.NewGuid().ToString();
+            await _repository.SaveAsync<Cost>(cost);
+            return cost;
+        }
+
     }
 }
