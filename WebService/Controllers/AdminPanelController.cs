@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Models.AdminAuthModels;
+using Models.AdminModels;
 using Models.Entities;
 using Newtonsoft.Json;
 using Services.Contracts;
@@ -128,6 +129,29 @@ namespace WebService.Controllers
             }
         }
 
+        public async Task<IActionResult> ProfitCalculation()
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> ProfitCalculation(FromToDate dateRange)
+        {
+            if (ModelState.IsValid == false)
+            {
+                return View(dateRange);
+            }
+            Debug.Print(dateRange.ToDateTime.ToString() + " at controller");
+            return RedirectToAction("BusinessStatus",new {valf = dateRange.FromDateTime.ToString(),valt = dateRange.ToDateTime.ToString()});
+        }
+
+        public async Task<IActionResult> BusinessStatus(string valf,string valt)
+        {
+            FromToDate val = new FromToDate();
+            val.FromDateTime = DateTime.Parse(valf);
+            val.ToDateTime = DateTime.Parse(valt);
+            var res = await _adminPanelService.BusinessStatus(val);
+            return View(res);
+        }
 
 
 
