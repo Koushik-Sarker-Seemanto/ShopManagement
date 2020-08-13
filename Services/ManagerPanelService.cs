@@ -81,7 +81,7 @@ namespace Services
             return product;
         }
 
-        public async Task<Product> UpdateCurrentStock(string productId, int stockAmount, double buyingPrice)
+        public async Task<List<string>> UpdateCurrentStock(string productId, int stockAmount, double buyingPrice)
         {
             try
             {
@@ -93,21 +93,28 @@ namespace Services
                 product.Stock += stockAmount;
                 if (product.StockWarning < product.Stock) product.Warning = false;
                 await _repository.UpdateAsync<Product>(d => d.Id == productId, product);
-                List<string> productList = new List<string>();
-                for (int i = 1; i <= stockAmount; i++)
+                
+                if (product.ProductType == "Barcode")
                 {
-                    var id = Guid.NewGuid().ToString();
-                    var individualProduct = new IndividualProduct
+                    List<string> productList = new List<string>();
+                    for (int i = 1; i <= stockAmount; i++)
                     {
-                        Id = id,
-                        CategoryId = productId,
-                        BuyingPrice = buyingPrice,
-                    };
-                    productList.Add(id);
-                    await _repository.SaveAsync<IndividualProduct>(individualProduct);
+                        var id = Guid.NewGuid().ToString();
+                        var individualProduct = new IndividualProduct
+                        {
+                            Id = id,
+                            CategoryId = productId,
+                            BuyingPrice = buyingPrice,
+                        };
+                        productList.Add(id);
+                        await _repository.SaveAsync<IndividualProduct>(individualProduct);
+                    }
+                    _logger.LogInformation($"----------------Calling GenerateBarcode-------------------");
+                    return productList;
+                    //GenerateBarCode(productList,product.Name);
                 }
-                GenerateBarCode(productList,product.Name);
-                return product;
+                
+                return null;
             }
             catch (Exception e)
             {
@@ -124,7 +131,7 @@ namespace Services
                 Dictionary<string, BaseEncodeType> collection = new Dictionary<string, BaseEncodeType>();
                 foreach (var item in productList)
                 {
-                    collection.Add(item, EncodeTypes.Code11);
+                    collection.Add(item, EncodeTypes.Code39Extended);
                 }
                 //collection.Add(productId, EncodeTypes.Code11);
                 List<Bitmap> images = new List<Bitmap>();
@@ -196,9 +203,17 @@ namespace Services
         {
             try
             {
-                var results = _repository.GetItems<Product>(d=>d.Warning == true);
+                var response = new List<Product>();
+                var results = _repository.GetItems<Product>();
+                foreach (var item in results)
+                {
+                    if (item.StockWarning >= item.Stock)
+                    {
+                        response.Add(item);
+                    }
+                }
                 
-                return results;
+                return response.AsQueryable();
             }
             catch (Exception ex)
             {

@@ -129,7 +129,7 @@
                 }
                 else {
                     var trHTML = '';
-                    trHTML += '<tr class="eachItem" type="non-bar" id="'+response.res.id+'"><td class="text-center productName">' + response.res.productTitle + '</td><td class="text-center amountSelect">'+amount+'</td><td class="text-center productPrice">' + response.res.sellingPrice + '</td><td class="text-center">'+ (parseFloat(response.res.sellingPrice) * parseFloat(amount)).toFixed(1) +'</td><td class="text-center"><button onclick="javascript: removeRow(this)" class="deleteIcon btn btn-danger">Remove</button></td></tr>';
+                    trHTML += '<tr class="eachItem" type="non-bar" id="'+response.res.id+'"><td class="text-center productName">' + response.res.productTitle + '</td><td class="text-center amountSelect">'+amount+'</td><td class="text-center unitProductPrice">' + response.res.sellingPrice + '</td><td class="text-center productPrice">'+ (parseFloat(response.res.sellingPrice) * parseFloat(amount)).toFixed(1) +'</td><td class="text-center"><button onclick="javascript: removeRow(this)" class="deleteIcon btn btn-danger">Remove</button></td></tr>';
                     $('#productToBeSold').append(trHTML);
                     //array.push(response.res.id);
                     $('#total').text(getTotalPrice());
@@ -173,7 +173,7 @@
                         });
                         if (exist === false){
                             var trHTML = '';
-                            trHTML += '<tr class="eachItem" type="bar" id="'+response.res.id+'"><td class="text-center productName">' + response.res.productTitle + '</td><td class="text-center amountSelect">1</td><td class="text-center productPrice">' + response.res.sellingPrice + '</td><td class="text-center">'+ response.res.sellingPrice +'</td><td class="text-center"><button onclick="javascript: removeRow(this)" class="deleteIcon btn btn-danger">Remove</button></td></tr>';
+                            trHTML += '<tr class="eachItem" type="bar" id="'+response.res.id+'"><td class="text-center productName">' + response.res.productTitle + '</td><td class="text-center amountSelect">1</td><td class="text-center unitProductPrice">' + response.res.sellingPrice + '</td><td class="text-center productPrice">'+ response.res.sellingPrice +'</td><td class="text-center"><button onclick="javascript: removeRow(this)" class="deleteIcon btn btn-danger">Remove</button></td></tr>';
                             $('#productToBeSold').append(trHTML);
                             //array.push(response.res.id);
                             $('#total').text(getTotalPrice());
@@ -316,7 +316,7 @@
             let type =  $(this).attr('type');
             if (type ==="bar"){
                 let name = $(this).find('td.productName').text();
-                let price = $(this).find('td.productPrice').text();
+                let price = $(this).find('td.unitProductPrice').text();
                 let quantity = 1;
                 for( let i = 0; i < productList.length; i++){
                     let prodName = productList[i].productName;
@@ -331,7 +331,7 @@
             }
             else{
                 let name = $(this).find('td.productName').text();
-                let price = $(this).find('td.productPrice').text();
+                let price = $(this).find('td.unitProductPrice').text();
                 let quantity = $(this).find('td.amountSelect').text();
                 productList.push({productName: name, productPrice: price, productQuantity: quantity});
             }
