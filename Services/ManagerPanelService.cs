@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Aspose.BarCode.Generation;
 using Microsoft.Extensions.Logging;
@@ -23,6 +24,15 @@ namespace Services
         {
             _repository = repository;
             _logger = logger;
+        }
+        static object locker = new object();
+        static string Generate15UniqueDigits()
+        {
+            lock (locker)
+            {
+                Thread.Sleep(100);
+                return DateTime.Now.ToString("yyyyMMddHHmmssf");
+            }
         }
         public async Task<Product> AddProduct(ProductViewModel model)
         {
@@ -99,7 +109,9 @@ namespace Services
                     List<string> productList = new List<string>();
                     for (int i = 1; i <= stockAmount; i++)
                     {
-                        var id = Guid.NewGuid().ToString();
+                        
+                        var uni = Generate15UniqueDigits();
+                        var id = uni;
                         var individualProduct = new IndividualProduct
                         {
                             Id = id,
