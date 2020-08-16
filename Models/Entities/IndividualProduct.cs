@@ -16,6 +16,7 @@ namespace Models.Entities
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public bool Sold { get; set; }
+        public double SellingPrice { get; set; }
         public string OrderId { get; set; }
         [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
         [BsonRepresentation(BsonType.DateTime)]

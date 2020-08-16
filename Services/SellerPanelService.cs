@@ -13,6 +13,7 @@ using Models.ViewModels.AdminPanel;
 using Models.ViewModels.SellerPanel;
 using Repositories;
 using Services.Contracts;
+using OrderViewModel = Models.ViewModels.SellerPanel.OrderViewModel;
 
 namespace Services
 {
@@ -92,6 +93,8 @@ namespace Services
             }
         }
 
+        
+
         public async Task<Order> SellProduct(OrderViewModel model)
         {
             try
@@ -105,6 +108,7 @@ namespace Services
                         if (product != null)
                         {
                             product.Stock = product.Stock - item.Amount;
+                            
                             await _repository.UpdateAsync<Product>(
                                 e => e.Id == product.Id, product);
                         }
@@ -129,6 +133,8 @@ namespace Services
                                 await _repository.UpdateAsync<Product>(
                                     e => e.Id == product.Id, product);
                             }
+
+                            individualProduct.SellingPrice = product.SellingPrice;
 
                             individualProduct.OrderId = orderId;
                             individualProduct.Sold = true;

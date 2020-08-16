@@ -108,7 +108,7 @@ namespace Services
             Debug.Print(res.Count + " " + val.FromDateTime.ToString()+" "+ val.ToDateTime.ToString());
             return res;
         }
-        public async Task<List<IndividualProduct>> IndividualProductInDateRange(FromToDate val)
+        public async Task<List<IndividualProduct>> IndividualProductSoldInDateRange(FromToDate val)
         {
             var ress = await _repository.GetItemsAsync<IndividualProduct>(d => d.SellDateTime > val.FromDateTime && d.SellDateTime < val.ToDateTime && d.Sold == true);
             var res = ress?.ToList();
@@ -122,6 +122,11 @@ namespace Services
             var res = ress?.ToList();
             // Debug.Print(res.Count + " " + val.FromDateTime.ToString() + " " + val.ToDateTime.ToString());
             return res;
+        }
+
+        public async Task<Product> ProductById(string id)
+        {
+            return await _repository.GetItemAsync<Product>(d => d.Id == id);
         }
 
 
@@ -146,7 +151,7 @@ namespace Services
             }
 
             //Total Buying Price
-            var resBuyCost = await IndividualProductInDateRange(val);
+            var resBuyCost = await IndividualProductSoldInDateRange(val);
             foreach (var product in resBuyCost)
             {
                 if (!all.ContainsKey(product.SellDateTime.Date))
@@ -179,6 +184,41 @@ namespace Services
             return res;
         }
 
+        public async Task<List<ProductSaleStatus>> ProductSaleStatus(FromToDate val)
+        {
+            var individualProducts = await IndividualProductSoldInDateRange(val);
+            Dictionary<string,ProductSaleStatus> dictionary = new Dictionary<string, ProductSaleStatus>();
+            foreach (var individual in individualProducts)
+            {
+                if (!dictionary.ContainsKey(individual.CategoryId))
+                {
+                    dictionary[individual.CategoryId] = new ProductSaleStatus();
+                    var res = await ProductById(individual.CategoryId);
+                    dictionary[individual.CategoryId].ProductName = res.Name;
+                    dictionary[individual.CategoryId].CurrentStock = res.Stock;
+                    dictionary[individual.CategoryId].ProductPrice = res.SellingPrice;
+                }
+
+                dictionary[individual.CategoryId].TotalUnitSale++;
+                dictionary[individual.CategoryId].TotalTakaSale += individual.SellingPrice;
+                dictionary[individual.CategoryId].TotalProfit += (individual.SellingPrice - individual.BuyingPrice);
+                dictionary[individual.CategoryId].AverageBuyingPrice += individual.BuyingPrice;
+                dictionary[individual.CategoryId].AverageSalePrice += individual.SellingPrice;
+            }
+
+            List<ProductSaleStatus> list = new List<ProductSaleStatus>();
+            foreach (KeyValuePair<string, ProductSaleStatus> entry in dictionary)
+            {
+                entry.Value.AverageBuyingPrice /= entry.Value.TotalUnitSale;
+                entry.Value.AverageSalePrice /= entry.Value.TotalUnitSale;
+                list.Add(entry.Value);
+            }
+            
+
+
+            return list;
+        }
+
         private async Task<List<User>> GetAllSeller()
         {
             try
@@ -201,6 +241,55 @@ namespace Services
                 _logger.LogError(ex, $"GetAllSeller Failed {ex.Message}");
                 return null;
             }
+        }
+
+        public async Task<IndividualProduct> GetIndividualProductById(string id)
+        {
+            return await _repository.GetItemAsync<IndividualProduct>(d => d.Id == id);
+        }
+
+        public async Task<OrderViewModel> GetOrderViewModel(string id)
+        {
+            var order = await _repository.GetItemAsync<Order>(d => d.Id == id);
+            var OrderView = new OrderViewModel();
+            OrderView.Id = order.Id;
+            OrderView.CustomerName = order.CustomerName;
+            OrderView.CustomerPhone = order.CustomerPhone;
+            OrderView.SoldAt = order.SoldAt;
+            OrderView.TotalPrice = order.TotalPrice;
+            OrderView.Discount = order.Discount;
+            OrderView.DueAmount = order.DueAmount;
+            OrderView.Products = new List<ProductOrderView>();
+            foreach (var indi in order.Products)
+            {
+                var res = await GetIndividualProductById(indi);
+                var add = new ProductOrderView();
+                add.IndividualProductId = indi;
+                add.ProductPrice = res.SellingPrice;
+                var product = await ProductById(res.CategoryId);
+                add.ProductName = product.Name;
+                OrderView.Products.Add(add);
+            }
+            OrderView.ProductNonBar = new List<NonBarViewModel>();
+            foreach (var non in order.ProductNonBar)
+            {
+                var res = await ProductById(non.ItemId);
+                var add = new NonBarViewModel();
+                add.Amount = non.Amount;
+                add.ItemId = non.ItemId;
+                add.ItemName = res.Name;
+                OrderView.ProductNonBar.Add(add);
+            }
+
+            return OrderView;
+        }
+
+        public async Task<bool> PayDue(string orderId, double dueAmount)
+        {
+            var order = await _repository.GetItemAsync<Order>(d => d.Id == orderId);
+            order.DueAmount = dueAmount;
+            await _repository.UpdateAsync<Order>(d => d.Id == orderId, order);
+            return true;
         }
     }
 }

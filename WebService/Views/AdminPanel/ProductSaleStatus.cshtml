@@ -1,0 +1,64 @@
+﻿
+@{
+    ViewData["Title"] = "ProductSaleStatus";
+    Layout = "_LayoutAdmin";
+}
+
+<h1>ProductSaleStatus</h1>
+
+<div class="table-responsive">
+    <table class="table table-bordered" id="productSaleStatus" width="100%" cellspacing="0">
+        <thead>
+        
+        <tr class="text-center">
+            <th>Product Name</th>
+            <th>Current Selling Price</th>
+            <th>Current Stock</th>
+            <th>Total Sale ( Unit )</th>
+            <th>Total Sale ( Taka )</th>
+            <th>Total Profit</th>
+            <th>Average Sale Price</th>
+            <th>Average Buying Price</th>
+        </tr>
+        </thead>
+
+    </table>
+</div>
+<script>
+    $("#productSaleStatus").DataTable({
+        "processing": true, // for show progress bar
+        "serverSide": true, // for process server side
+        "filter": true, // this is for disable filter (search box)
+        "orderMulti": false, // for disable multiple column at once
+        "ajax": {
+            "url": "/AdminPanel/ProductSale",
+            "type": "POST",
+            "datatype": "json"
+        },
+        "columnDefs": [
+            {
+                "targets": "_all",
+                "className": "text-center",
+            },
+            {
+                "targets": [7],
+                "orderable": false,
+            },
+        ],
+        "columns": [
+            { "data": "productName", "name": "Product Name", "autoWidth": true },
+            { "data": "productPrice", "name": "Current Selling Price", "autoWidth": true },
+            { "data": "currentStock", "name": "Current Stock", "autoWidth": true },
+            { "data": "totalUnitSale", "name": "Total Sale ( Unit )", "autoWidth": true },
+            { "data": "totalTakaSale", "name": "Total Sale ( Taka )", "autoWidth": true },
+            { "data": "totalProfit", "name": "Total Profit", "autoWidth": true },
+            { "data": "averageSalePrice", "name": "Average Sale Price", "autoWidth": true },
+            { "data": "averageBuyingPrice", "name": "Average Buying Price", "autoWidth": true },
+
+           
+        ]
+
+    });
+
+</script>
+

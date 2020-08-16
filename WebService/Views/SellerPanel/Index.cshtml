@@ -258,6 +258,10 @@
                     $("#showInvoice").attr('name', response.orderId);
                     alert("OK");
                     createInvoice();
+                    $("#payment").attr('disabled', 'disabled');
+                    $("#discount").attr('disabled', 'disabled');
+                    $("#inbox").attr('disabled', 'disabled');
+                    $("#inbox-non-barcode").attr('disabled', 'disabled');
                 } else {
                     alert("Fail");
                 }
