@@ -162,14 +162,12 @@ namespace WebService.Controllers
 
                 // Getting all Customer data
                 var productData = _managerPanelService.GetAllStockEnd();
-                /// Todo : Query write Correctly
-                productData = productData.AsQueryable().Where(d=>d.StockWarning >d.Stock);
 
-                // //Sorting
-                // if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
-                // {
-                //     productData = productData.OrderBy(sortColumn + " " + sortColumnDirection);
-                // }
+                //Sorting
+                if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
+                {
+                    productData = productData.OrderBy(sortColumn + " " + sortColumnDirection);
+                }
                 //Search
                 if (!string.IsNullOrEmpty(searchValue))
                 {
@@ -223,12 +221,21 @@ namespace WebService.Controllers
             logger.LogInformation($" ---------------------------- {stock} ------------ {productId}");
             //Debug.Print(" ---------------------------- " + stock + "------------" + productId);
             var resProduct = await _managerPanelService.UpdateCurrentStock(productId, stock, buyingPrice);
+            var product = await _managerPanelService.FindProductById(productId);
             if (resProduct == null)
             {
+                if (product.ProductType == "Barcode")
+                {
+                    return Json(new { res = "", status = "Fail" });
+                }
+                return Json(new { res = "NonBarCode", status = "Success" });
                 //Error Should be raised.
-                return RedirectToAction("ProductDetails", "ManagerPanel", new {productId = productId});
+                //return RedirectToAction("ProductDetails", "ManagerPanel", new {productId = productId});
+                
             }
-            return RedirectToAction("ProductDetails", "ManagerPanel", new {productId = productId});
+
+            return Json(new { res = JsonConvert.SerializeObject(resProduct), status = "Success", productName = product.Name });
+            //return RedirectToAction("ProductDetails", "ManagerPanel", new {productId = productId});
         }
     }
 }

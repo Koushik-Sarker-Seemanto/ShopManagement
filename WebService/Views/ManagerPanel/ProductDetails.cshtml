@@ -43,15 +43,21 @@
                     <p id="details" class="list-group-item">N/A</p>
                 }
                 <br/>
-                
-                <form method="get" style="margin-left: 5%; margin-right: 5%;margin-top:5% " asp-controller="ManagerPanel" asp-action="GenerateBarcode">
+
+                <form id="generateProductForm" method="get" style="margin-left: 5%; margin-right: 5%;margin-top:5% " asp-controller="ManagerPanel" asp-action="GenerateBarcode">
                     <label><b>Stock To Add</b></label>
                 
-                    <input class="form-control py-4" id="stock" name="stock" placeholder="Enter Stock Amount to Add">
+                    <input class="form-control py-4" id="stockId" name="stock" placeholder="Enter Stock Amount to Add">
                     <input class="form-control py-4" id="buyingPrice" name="buyingPrice" placeholder="Enter Buying Price">
                     <input class="form-control py-4" id="productId" name="productId" style="visibility: hidden" value="@Model.Id">
-                    <input type="submit" class="btn btn-success" value="Generate Barcode"/>
+                    <input id="generateProductBtn" type="submit" class="btn btn-success" value="Generate Product"/>
                 </form>
+                
+                <div>
+                    <div class="col-lg-12" id="barcodeDiv" style="background: white">
+                        <h2 class="d-flex justify-content-center" id="barcodeImgTitle"></h2>
+                    </div>
+                </div>
             </div>
             
         </div>
@@ -72,8 +78,79 @@ else
     </div>
 }
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js" integrity="sha512-s/XK4vYVXTGeUSv4bRPOuxSDmDlTedEpMEcAQk0t/FMd9V6ft8iXdwSBxV0eD60c6w/tjotSlKu9J2AAW1ckTA==" crossorigin="anonymous"></script>
 
+<script>
 
+$(document).ready(function() {
+    
+    $("#generateProductForm").submit(function(e) {
+        e.preventDefault();
+        let stockVal = $("#stockId").val();
+        let buyingPriceVal = $("#buyingPrice").val();
+        let productIdVal = $("#productId").val();
+        console.log(stockVal+" : "+buyingPriceVal+" : "+productIdVal);
+        if (stockVal === "" || stockVal === undefined || buyingPriceVal === "" || 
+            buyingPriceVal === undefined || productIdVal === "" || productIdVal === undefined){
+            alert("Invalid Input");
+            return false;
+        }
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GenerateBarcode", "ManagerPanel")',
+            contentType: "application/json; charset=utf-8",
+            data: {
+                stock: stockVal,
+                buyingPrice: buyingPriceVal,
+                productId: productIdVal,
+            },
+            success: function(response) {
+                if (response.status === "Success"){
+                    if (response.res === "NonBarCode"){
+                        alert("NonBarCode product added!");
+                        return false;
+                    }
+                    console.log("List Found");
+                    let list = JSON.parse(response.res);
+                    let productName = response.productName;
+                    generateBarcode(list, productName);
+                    //downloadBarcodePdf();
+                }
+                else {
+                    alert("Response status Fail");
+                }
+            },
+            error: function() {
+                console.log("Error!!! List Not Found")
+            },
+        });
+    });
+});
+
+function generateBarcode(list,productName) {
+    //let ids = ["2c2e2100-f590-46c7-860d-bde538fb7eff", "ac32365b-7ca8-47c3-903a-f1f1dff5fe13", "ae75c229-3ea0-4027-ad1a-73b6091dc71b"];
+    //let testId = "ac32365b-7ca8-47c3-903a-f1f1dff5fe13";
+    $("#barcodeImgTitle").text(productName);
+    for (i = 0; i < list.length; i++){
+        let id = 'barcodeSvg' + i;
+        let img = `<svg id="${id}"></svg>`;
+        $("#barcodeDiv").append(img);
+        JsBarcode(`#${id}`, list[i]);
+    }
+}
+
+/*function downloadBarcodePdf() {
+    var doc = new jsPDF();
+    
+    doc.addHTML(document.getElementById('barcodeDiv'), function() {
+        //doc.save('invoice.pdf');
+        doc.autoPrint();
+        //This is a key for printing
+        doc.output('dataurlnewwindow');
+    });
+}*/
+</script>
 
 
 
