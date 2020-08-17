@@ -291,5 +291,31 @@ namespace Services
             await _repository.UpdateAsync<Order>(d => d.Id == orderId, order);
             return true;
         }
+
+        public async Task<List<DayToDayCost>> CostStatus(FromToDate date)
+        {
+            var costs = await CostInDateRange(date);
+            var res = new List<DayToDayCost>();
+            Dictionary<string,DayToDayCost> dictionary = new Dictionary<string, DayToDayCost>();
+            foreach (var cost in costs)
+            {
+                if (!dictionary.ContainsKey(cost.CreatedAt.Date.ToString()))
+                {
+                    var daily = new DayToDayCost();
+                    dictionary[cost.CreatedAt.Date.ToString()] = daily;
+                    dictionary[cost.CreatedAt.Date.ToString()].TotalCost = 0;
+                }
+
+                dictionary[cost.CreatedAt.Date.ToString()].date = cost.CreatedAt.Date;
+                dictionary[cost.CreatedAt.Date.ToString()].TotalCost += cost.Amount;
+            }
+            List<DayToDayCost> list = new List<DayToDayCost>();
+            foreach (KeyValuePair<string, DayToDayCost> entry in dictionary)
+            {
+                list.Add(entry.Value);
+            }
+
+            return list;
+        }
     }
 }

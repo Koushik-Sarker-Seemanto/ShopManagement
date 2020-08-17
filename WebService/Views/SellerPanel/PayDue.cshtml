@@ -1,0 +1,251 @@
+﻿@model Models.ViewModels.AdminPanel.OrderViewModel
+@{
+    ViewData["Title"] = "Pay Due";
+    Layout = "_LayoutSeller";
+}
+
+<h1>Order Detailes</h1>
+
+<div id="content" class="card mb-4">
+    <div class="card-header" id="manager-table-header" style="cursor: pointer">
+        <i class="fas fa-table mr-1"></i>
+        Product Invoice
+        <i class="fas fa-caret-down float-right"></i>
+    </div>
+    <div class="card-body">
+
+        <div class="form-row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="mb-1" for="name">Buyer Name</label>
+                    <input class="form-control" placeholder="Name" id="name" value="@Model.CustomerName" readonly />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="mb-1" for="phone">Buyer Phone</label>
+                    <input class="form-control" placeholder="Phone Number" id="phone" value="@Model.CustomerPhone" readonly />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="table-responsive m-2">
+        <table class="table table-bordered" id="productToBeSold" width="100%" cellspacing="0">
+            <colgroup>
+                <col span="1" style="width: 50%;">
+                <col span="1" style="width: 10%;">
+                <col span="1" style="width: 15%;">
+                <col span="1" style="width: 20%;">
+                <col span="1" style="width: 5%">
+
+
+                @* <col span="1" style="width: 10%;"> *@
+            </colgroup>
+            <thead>
+                <tr class="text-center">
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Total Price</th>
+
+                </tr>
+            </thead>
+            @foreach (var product in Model.Products)
+            {
+                <tr class="each-item" type="bar">
+                    <td class="text-center productName">@product.ProductName</td>
+                    <td class="text-center amountSelect" >1</td>
+                    <td class="text-center productPrice">@product.ProductPrice</td>
+                    <td class="text-center">@product.ProductPrice</td>
+                </tr>
+            }
+            @foreach (var product in Model.ProductNonBar)
+            {
+                <tr class="each-item" type="non-bar">
+                    <td class="text-center productName">@product.ItemName</td>
+                    <td class="text-center amountSelect">@product.Amount</td>
+                    <td>N/A</td>
+                    <td>N/A</td>
+                </tr>
+            }
+
+        </table>
+    </div>
+
+
+
+    <div class="table-responsive m-2">
+        <table class="table table-bordered" id="sellAmount" width="100%" cellspacing="0">
+            <colgroup>
+                <col span="1" style="width: 60%;">
+                <col span="1" style="width: 35%;">
+
+            </colgroup>
+            <thead>
+                <tr>
+                    <td class="text-right">Discount</td>
+                    <td><input class="form-control" value="@Model.Discount" placeholder="0" id="discount" readonly /></td>
+                </tr>
+                <tr>
+                    <td class="text-right">Total Price</td>
+                    <td id="total">@Model.TotalPrice </td>
+                </tr>
+                <tr>
+                    <td class="text-right">Payment</td>
+                    <td><input class="form-control" value="0" placeholder="0" id="payment"></td>
+                </tr>
+                <tr>
+                    <td class="text-right">Due</td>
+                    <td id="due">@Model.DueAmount </td>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+
+<div style="text-align: center">
+    <button class="btn btn-success" id="checkout"> Checkout </button>
+</div>
+
+<div id="elementH"></div>
+
+<div class="container m-auto" id="showInvoice"></div>
+<script>
+    var totalPrice = @Model.TotalPrice;
+    $('#payment').on('input', function() {
+        $("#due").text(getDue());
+    });
+    function getDue() {
+        let duee = @Model.DueAmount;
+        let payment = $("#payment").val();
+        return (parseFloat(duee) - parseFloat(payment)).toFixed(1);
+    }
+
+    $('#checkout').click(function () {
+        if (getDue() < 0) {
+            alert("Due Amount Cannot be negetive");
+            return;
+        }
+        Swal.fire({
+            title: 'Loading',
+            text: 'Please Wait...',
+            showCancelButton: false,
+            showConfirmButton: false
+        });
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("PayDueAPi", "SellerPanel")',
+            datatype: "json",
+            data: {
+                due: getDue(),
+                orderid: "@Model.Id"
+            },
+            success: function (response) {
+                if (response.status === "Success") {
+                    $("#showInvoice").attr('name', response.orderId);
+                   
+                    swal.close();
+                    createInvoice();
+                    $("#payment").attr('disabled', 'disabled');
+                } else {
+                    alert("Fail");
+                }
+            },
+            error: function (response) {
+                alert("Fail Req");
+            }
+        });
+    });
+</script>
+
+<script>
+
+
+    function createInvoice() {
+        let productList = [];
+        let buyerName = $("#name").val();
+        let buyerPhone = $("#phone").val();
+        if (buyerName === "" || buyerName === undefined) {
+            buyerName = "N/A";
+        }
+        if (buyerPhone === "" || buyerPhone === undefined) {
+            buyerPhone = "N/A";
+        }
+//        let orderId = $("#showInvoice").attr('name');
+
+        let domStart = `<div id="invoice-content" class="m-auto" style="width: 400px; background: white">
+                            <h1 class="d-flex justify-content-center" style="color: green">Invoice</h1>
+                            <p class="d-flex justify-content-center" >OrderId: @Model.Id</p><hr>
+                            <p id="name" class="list-group-item">Customer Name: ${buyerName}</p>
+                            <p id="name" class="list-group-item">Customer Phone: ${buyerPhone}</p>
+                            <br>
+                            <table class="table">
+                                <thead><th>Product</th><th>Qty</th><th>Unit$</th><th>Price$</th></thead>
+                                <tbody>`;
+        let row = '';
+        $('tr.eachItem').each(function () {
+            let type = $(this).attr('type');
+            if (type === "bar") {
+                let name = $(this).find('td.productName').text();
+                let price = $(this).find('td.productPrice').text();
+                let quantity = 1;
+                for (let i = 0; i < productList.length; i++) {
+                    let prodName = productList[i].productName;
+                    if (prodName === name) {
+                        quantity += 1;
+                        productList[i].productQuantity += parseInt(1);
+                    }
+                }
+                if (quantity === 1) {
+                    productList.push({ productName: name, productPrice: price, productQuantity: quantity });
+                }
+            }
+            else {
+                let name = $(this).find('td.productName').text();
+                let price = $(this).find('td.productPrice').text();
+                let quantity = $(this).find('td.amountSelect').text();
+                productList.push({ productName: name, productPrice: price, productQuantity: quantity });
+            }
+        });
+
+
+        for (let i = 0; i < productList.length; i++) {
+            let prodName = productList[i].productName;
+            let prodPrice = productList[i].productPrice;
+            let prodQuantity = productList[i].productQuantity;
+            row = row + `<tr><td>${prodName}</td> <td>${prodQuantity}</td> <td>${prodPrice}</td> <td>${prodPrice * prodQuantity}</td></tr>`;
+        }
+
+        let discount = $("#discount").val();
+        let totalPrice = @Model.TotalPrice;
+        let due = getDue();
+        let payment = $('#payment').val();
+
+        let domEnd = `<tr style="background: #eeeeee"><td colspan="3" class="text-right">Discount $</td><td>${discount}</td></tr>
+                             <tr style="background: #eeeeee"><td colspan="3" class="text-right">Total Price $</td><td>${totalPrice}</td></tr>
+<tr style="background: #eeeeee"><td colspan="3" class="text-right">Old Due $</td><td>@Model.DueAmount</td></tr>
+                            
+                            <tr style="background: #eeeeee"><td colspan="3" class="text-right">Payment $</td><td>${payment}</td></tr>
+                             <tr style="background: #eeeeee"><td colspan="3" class="text-right">Due $</td><td>${due}</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3" style="text-align: center">
+                        <button class="btn btn-success" onclick="javascript: downloadPDF()"> Print Invoice </button>
+                    </div>
+                    `;
+        let finalDom = domStart + row + domEnd;
+        $("#showInvoice").append(finalDom);
+    }
+
+    function downloadPDF() {
+        var doc = new jsPDF('p', 'mm', [105.83, 296]);
+
+        doc.addHTML(document.getElementById('invoice-content'), function () {
+            //doc.save('invoice.pdf');
+            doc.autoPrint();
+            //This is a key for printing
+            doc.output('dataurlnewwindow');
+        });
+    }
+</script>

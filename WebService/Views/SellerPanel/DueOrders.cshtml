@@ -1,6 +1,6 @@
 ﻿@{
     ViewData["Title"] = "Due Orders";
-    Layout = "_LayoutAdmin";
+    Layout = "_LayoutSeller";
 }
 <h1>@ViewData["Title"]</h1>
 
@@ -26,7 +26,7 @@
         "filter": true, // this is for disable filter (search box)
         "orderMulti": false, // for disable multiple column at once
         "ajax": {
-            "url": "/AdminPanel/Dues",
+            "url": "/SellerPanel/Dues",
             "type": "POST",
             "datatype": "json"
         },
@@ -46,7 +46,7 @@
             { "data": "customerPhone", "name": "Customer Phone", "autoWidth": true },
             { "data": "dueAmount", "name": "Due Amount", "autoWidth": true },
             {
-                "render": function (data, type, full, meta) { return '<a class="btn btn-info" href="PayDue?id=' + full.id + '">Details</a>'; }
+                "render": function (data, type, full, meta) { return '<a class="btn btn-info" href="PayDue?id=' + full.id + '">Pay Due</a>'; }
             },
         ]
 

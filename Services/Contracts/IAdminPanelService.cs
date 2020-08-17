@@ -17,5 +17,6 @@ namespace Services.Contracts
         Task<List<ProductSaleStatus>> ProductSaleStatus(FromToDate val);
         Task<OrderViewModel> GetOrderViewModel(string id);
         Task<bool> PayDue(string orderId, double dueAmount);
+        Task<List<DayToDayCost>> CostStatus(FromToDate date);
     }
 }

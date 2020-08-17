@@ -72,6 +72,21 @@ namespace WebService.Controllers
         {
             return View();
         }
+        public async Task<IActionResult> PayDue(string id)
+        {
+            var model = await _adminPanelService.GetOrderViewModel(id);
+            return View(model);
+        }
+
+        public async Task<IActionResult> PayDueApi()
+        {
+            var due = Request.Form["due"].ToString();
+            var orderid = Request.Form["orderid"].ToString();
+            Debug.Print(due + " 0 " + orderid);
+
+            await _adminPanelService.PayDue(orderid, Double.Parse(due));
+            return Json(new { status = "Success", orderId = orderid });
+        }
 
         public IActionResult Dues()
         {
@@ -239,22 +254,35 @@ namespace WebService.Controllers
             }
         }
 
-        public async Task<IActionResult> PayDue(string id)
+        
+
+        public async Task<IActionResult> DailyCostingSearch()
         {
-            var model = await _adminPanelService.GetOrderViewModel(id);
-            return View(model);
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> DailyCostingSearch(FromToDate dateRange)
+        {
+            if (ModelState.IsValid == false)
+            {
+                return View(dateRange);
+            }
+            Debug.Print(dateRange.ToDateTime.ToString() + " at controller");
+            return RedirectToAction("ProductSaleStatus", new { valf = dateRange.FromDateTime.ToString(), valt = dateRange.ToDateTime.ToString() });
+
         }
 
-        public async Task<IActionResult> PayDueApi()
+        public async Task<IActionResult> DailyCosting(string valf, string valt)
         {
-            var due = Request.Form["due"].ToString();
-            var orderid = Request.Form["orderid"].ToString();
-            Debug.Print(due + " 0 " + orderid);
+            FromToDate val = new FromToDate();
+            val.FromDateTime = DateTime.Parse(valf);
+            val.ToDateTime = DateTime.Parse(valt);
 
-            await _adminPanelService.PayDue(orderid, Double.Parse(due));
-            return Json(new { status = "Success", orderId = orderid});
+            var lst = await _adminPanelService.CostStatus(val);
+            var res = new DailyCostStatus();
+            res.DailyCosts = lst;
+            return View(res);
         }
-
 
 
     }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,9 +18,11 @@ namespace WebService.Controllers
     public class SellerPanelController : Controller
     {
         private ISellerPanelService _sellerPanelService;
+        private IAdminPanelService _adminPanelService;
         private ILogger<SellerPanelController> logger;
-        public SellerPanelController(ISellerPanelService sellerPanelService, ILogger<SellerPanelController> logger)
+        public SellerPanelController(IAdminPanelService adminPanelService,ISellerPanelService sellerPanelService, ILogger<SellerPanelController> logger)
         {
+            _adminPanelService = adminPanelService;
             _sellerPanelService = sellerPanelService;
             this.logger = logger;
         }
@@ -162,6 +165,83 @@ namespace WebService.Controllers
             var model = await _sellerPanelService.GetAllDetail(inp);
             logger.LogInformation(model.Product.Id+"++++++++++++++++++++++++++");
             return View(model);
+        }
+
+        public async Task<IActionResult> DueOrders()
+        {
+            return View();
+        }
+        public async Task<IActionResult> PayDue(string id)
+        {
+            var model = await _adminPanelService.GetOrderViewModel(id);
+            return View(model);
+        }
+
+        public async Task<IActionResult> PayDueApi()
+        {
+            var due = Request.Form["due"].ToString();
+            var orderid = Request.Form["orderid"].ToString();
+            Debug.Print(due + " 0 " + orderid);
+
+            await _adminPanelService.PayDue(orderid, Double.Parse(due));
+            return Json(new { status = "Success", orderId = orderid });
+        }
+
+        public IActionResult Dues()
+        {
+            try
+            {
+                var draw = HttpContext.Request.Form["draw"].FirstOrDefault();
+                // Skiping number of Rows count  
+                var start = Request.Form["start"].FirstOrDefault();
+                // Paging Length 10,20  
+                var length = Request.Form["length"].FirstOrDefault();
+                // Sort Column Name  
+                var sortColumn = Request.Form["columns[" + Request.Form["order[0][column]"].FirstOrDefault() + "][name]"].FirstOrDefault();
+                logger.LogInformation($"sortColumn: {sortColumn}");
+                // Sort Column Direction ( asc ,desc)  
+                var sortColumnDirection = Request.Form["order[0][dir]"].FirstOrDefault();
+                logger.LogInformation($"sortColumnDirection: {sortColumnDirection}");
+                // Search Value from (Search box)  
+                var searchValue = Request.Form["search[value]"].FirstOrDefault();
+
+                //Paging Size (10,20,50,100)  
+                int pageSize = length != null ? Convert.ToInt32(length) : 0;
+                int skip = start != null ? Convert.ToInt32(start) : 0;
+                int recordsTotal = 0;
+
+                // Getting all Customer data
+                var productData = _adminPanelService.GetAllDueOrders();
+
+
+
+                /// Todo: Sorting
+                /// 
+
+                // Sorting
+                // if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
+                // {
+                //     productData = productData.OrderBy(sortColumn + " " + sortColumnDirection);
+                // }
+                // Search
+                if (!string.IsNullOrEmpty(searchValue))
+                {
+                    productData = productData.Where(m => m.CustomerName.ToUpper().Contains(searchValue.ToUpper()));
+                }
+
+                //total number of rows count   
+                recordsTotal = productData.Count();
+                //Paging   
+                var data = productData.Skip(skip).Take(pageSize).ToList();
+                logger.LogInformation($"Data: {JsonConvert.SerializeObject(data)}");
+                //Returning Json Data  
+                return Json(new { draw = draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = data });
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"Products Endpoint Failed: {ex.Message}");
+                return BadRequest("Exception occured");
+            }
         }
     }
 }

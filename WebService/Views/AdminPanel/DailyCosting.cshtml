@@ -1,0 +1,35 @@
+﻿@model Models.ViewModels.AdminPanel.DailyCostStatus
+@{
+    ViewData["Title"] = "DailyCosting";
+    Layout = "_LayoutAdmin";
+}
+ 
+
+<div class="container-fluid m-auto">
+    <div class="m-auto col-lg-9 bg-white p-5 mt-3 mb-3">
+        <h1 class="d-flex justify-content-center">Daily Cost Status</h1>
+        <div class="table-responsive-md">
+            <table class="table-bordered table table-striped">
+                <thead>
+                <tr class="bg-success text-white">
+                    <td class="text-center font-weight-bold">Date</td>
+                    <td class="text-center font-weight-bold">Total Cost</td>
+                    </tr>
+                </thead>
+
+                <tbody>
+                   
+                    <tr>
+                        @foreach (var day in @Model.DailyCosts)
+                        {
+                            <td class="text-center">@day.date.Date.ToString()</td>
+
+                            <td class="text-center">@day.TotalCost</td>
+                        }
+
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
