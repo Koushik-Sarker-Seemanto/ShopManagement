@@ -34,6 +34,7 @@
 @*<div style="text-align: end">
     <input placeholder="Discount Amount" id="discount"/>
 </div>*@
+
 <div class="table-responsive m-2">
     <table class="table table-bordered" id="sellAmount" width="100%" cellspacing="0">
         <colgroup>
@@ -42,22 +43,29 @@
 
         </colgroup>
         <thead>
-        <tr>
-            <td class="text-right">Discount</td>
-            <td><input class="form-control" value="0" placeholder="0" id="discount"/></td>
-        </tr>
+        @if (@ViewBag.Index == true)
+        {
+            <tr>
+                <td class="text-right">Discount</td>
+                <td><input class="form-control" value="0" placeholder="0" id="discount"/></td>
+            </tr>
+        }
         <tr>
             <td class="text-right">Total Price</td>
             <td id="total">0.00</td>
         </tr>
-        <tr>
-            <td class="text-right">Payment</td>
-            <td><input class="form-control" value="0" placeholder="0" id="payment"></td>
-        </tr>
-        <tr>
-            <td class="text-right">Due</td>
-            <td id="due">0.00</td>
-        </tr>
+        @if (@ViewBag.Index == true)
+        {
+            <tr>
+                <td class="text-right">Payment</td>
+                <td><input class="form-control" value="0" placeholder="0" id="payment"></td>
+            </tr>
+
+            <tr>
+                <td class="text-right">Due</td>
+                <td id="due">0.00</td>
+            </tr>
+        }
         </thead>
     </table>
 </div>

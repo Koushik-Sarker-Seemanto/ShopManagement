@@ -27,20 +27,35 @@ namespace Services
             this.logger = logger;
         }
 
-        public async Task<ProductSellViewModel> GetProductFromBar(string id)
+        public async Task<ProductSellViewModel> GetProductFromBar(string id, bool returnProduct)
         {
             ProductSellViewModel resProduct = null;
             if (id != null)
             {
-                var indevidualProduct = await _repository.GetItemAsync<IndividualProduct>(d => d.Id == id && d.Sold == false);
+                IndividualProduct indevidualProduct = null;
+                if (!returnProduct)
+                {
+                    indevidualProduct = await _repository.GetItemAsync<IndividualProduct>(d => d.Id == id && d.Sold == false);
+                }
+                else
+                {
+                    indevidualProduct = await _repository.GetItemAsync<IndividualProduct>(d => d.Id == id && d.Sold == true);
+                }
                 if (indevidualProduct != null)
                 {
                     var product = await _repository.GetItemAsync<Product>(d => d.Id == indevidualProduct.CategoryId);
                     if (product != null)
                     {
-                        resProduct = new ProductSellViewModel();
-                        resProduct.Id = indevidualProduct.Id;
-                        resProduct.ProductTitle = product.Name;
+                        resProduct = new ProductSellViewModel
+                        {
+                            Id = indevidualProduct.Id,
+                            ProductTitle = product.Name,
+                        };
+                        if (returnProduct)
+                        {
+                            resProduct.SellingPrice = indevidualProduct.SellingPrice;
+                        }
+
                         resProduct.SellingPrice = product.SellingPrice;
                         return resProduct;
                     }
@@ -171,6 +186,69 @@ namespace Services
             catch (Exception ex)
             {
                 logger.LogError(ex, $"SellProduct Failed: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<ReturnProduct> ReturnProduct(ReturnViewModel model)
+        {
+            try
+            {
+                if (model?.Order != null)
+                {
+                    foreach (var item in model.Order)
+                    {
+                        var individualProduct = await _repository.GetItemAsync<IndividualProduct>(d => d.Id == item && d.Sold == true);
+                        if (individualProduct != null)
+                        {
+                            var product =
+                                await _repository.GetItemAsync<Product>(e => e.Id.Equals(individualProduct.CategoryId));
+                            if (product != null)
+                            {
+                                product.Stock = product.Stock + 1;
+                                await _repository.UpdateAsync<Product>(
+                                    e => e.Id == product.Id, product);
+                            }
+                            
+                            var order = await _repository.GetItemAsync<Order>(e => e.Id == individualProduct.OrderId);
+                            if (order != null)
+                            {
+                                var temp = order.Products;
+                                temp.Remove(individualProduct.Id);
+                                order.Products = temp;
+                                order.TotalPrice = order.TotalPrice - individualProduct.SellingPrice;
+                                
+                                await _repository.UpdateAsync<Order>(e => e.Id == order.Id, order);
+                            }
+                            
+                            individualProduct.Sold = false;
+                            individualProduct.OrderId = String.Empty;
+                            await _repository.UpdateAsync<IndividualProduct>(
+                                e => e.Id == individualProduct.Id, individualProduct);
+                        }
+                        else
+                        {
+                            return null;
+                        }
+                    }
+                    ReturnProduct returnProduct = new ReturnProduct
+                    {
+                        Id = Guid.NewGuid().ToString(),
+                        Products = model.Order,
+                        CustomerName = model.Name,
+                        CustomerPhone = model.Phone,
+                        ReturnAt = DateTime.Now,
+                        TotalPrice = model.TotalPrice,
+                    };
+                    await _repository.SaveAsync<ReturnProduct>(returnProduct);
+                    return returnProduct;
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"ReturnProduct Failed: {ex.Message}");
                 return null;
             }
         }

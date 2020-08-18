@@ -31,13 +31,64 @@ namespace WebService.Controllers
         {
             return View();
         }
+
         [HttpGet]
-        public async Task<IActionResult> GetProduct(string id)
+        public IActionResult ReturnProduct()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ReturnProducts()
+        {
+            try
+            {
+                var orderData = Request.Form["order"];
+                var order = JsonConvert.DeserializeObject<List<string>>(orderData);
+                var name = Request.Form["name"].ToString();
+                var phone = Request.Form["phone"].ToString();
+                var totalPrice = Request.Form["totalAmount"].ToString();
+                if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(phone))
+                {
+                    return Json(new {status = "Fail", errorMessage = "Customer Name or phone number can't be empty!!!"});
+                }
+
+                ReturnViewModel model = new ReturnViewModel
+                {
+                    TotalPrice = Double.Parse(totalPrice),
+                    Name = name,
+                    Phone = phone
+                };
+                var products = new List<string>();
+                foreach (var item in order)
+                {
+                    products.Add(item);
+                    logger.LogInformation($"ProductttttttttttttttId: {item}");
+                }
+
+                model.Order = products;
+                
+                var response = await _sellerPanelService.ReturnProduct(model);
+                if (response != null)
+                {
+                    return Json(new {status = "Success"});
+                }
+                return Json(new {status = "Fail", errorMessage = ""});
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, $"SellProduct Endpoint Failed: {ex.Message}");
+                return Json(new {status = "Fail", errorMessage = ex});
+            }
+        }
+        
+        [HttpGet]
+        public async Task<IActionResult> GetProduct(string id, bool returnProduct = false)
         {
             Debug.Print(id + "---------------------->");
             if (id != null)
             {
-                var res = await _sellerPanelService.GetProductFromBar(id);
+                var res = await _sellerPanelService.GetProductFromBar(id, returnProduct);
                 if (res != null)
                 {
                     Debug.Print("a " +res.ProductTitle );
