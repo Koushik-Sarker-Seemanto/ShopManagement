@@ -213,7 +213,7 @@ namespace WebService.Controllers
         {
             var inp = new ProductIdInput();
             inp.ProductId = id;
-            var model = await _sellerPanelService.GetAllDetail(inp);
+            var model = await _sellerPanelService.ProductDetailWithReturn(inp);
             logger.LogInformation(model.Product.Id+"++++++++++++++++++++++++++");
             return View(model);
         }
@@ -294,5 +294,7 @@ namespace WebService.Controllers
                 return BadRequest("Exception occured");
             }
         }
+
+        
     }
 }

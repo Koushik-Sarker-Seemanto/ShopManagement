@@ -16,6 +16,6 @@ namespace Services.Contracts
         public Task<Order> SellProduct(OrderViewModel model);
         public Task<ReturnProduct> ReturnProduct(ReturnViewModel model);
         public List<IndividualProduct> GetAllProducts();
-        public  Task<ProductDetails> GetAllDetail(ProductIdInput product);
+        public Task<ProductDetails> ProductDetailWithReturn(ProductIdInput product);
     }
 }
