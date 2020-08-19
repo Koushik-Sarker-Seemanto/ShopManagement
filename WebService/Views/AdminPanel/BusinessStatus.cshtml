@@ -20,25 +20,36 @@
                 <td class="text-center font-weight-bold">Total Due</td>
                 </tr>
             </thead>
-
+            <script>
+                var profit = 0;
+            </script>
             <tbody>
                    
-                <tr>
+               
                     @foreach (var day in @Model.dailyCalculations)
                     {
-                        <td class="text-center">@day.day.Date.ToString("D")</td>
-                        <td class="text-center">@day.TotalSell</td>
-                        <td class="text-center">@day.TotalBuyingCost</td>
-                        <td class="text-center">@day.TotalCost</td>
-                        <td class="text-center">@day.TotalProfit</td>
-                        <td class="text-center">@day.TotalDue</td>
-
-
-
-
+                        <tr>
+                            <td class="text-center">@day.day.Date.ToString("D")</td>
+                            <td class="text-center">@day.TotalSell</td>
+                            <td class="text-center">@day.TotalBuyingCost</td>
+                            <td class="text-center">@day.TotalCost</td>
+                            <td class="text-center">@day.TotalProfit</td>
+                            <td class="text-center">@day.TotalDue</td>
+                        </tr>
+                        
                     }
+            <tr>
+                <td class="text-center bg-danger" >Total</td>
+                <td class="text-center bg-light">@Model.TotalSell</td>
+                <td class="text-center bg-light">@Model.TotalBuyingCost</td>
+                <td class="text-center bg-light">@Model.TotalCost</td>
+                <td class="text-center bg-light" id="profit">@Model.TotalProfit</td>
+                <td class="text-center bg-light">@Model.TotalDue</td>
 
-                </tr>
+            </tr>
+                
+
+                
             </tbody>
         </table>
         </div>

@@ -165,6 +165,7 @@ namespace WebService.Controllers
             FromToDate val = new FromToDate();
             val.FromDateTime = DateTime.Parse(valf);
             val.ToDateTime = DateTime.Parse(valt);
+            val.ToDateTime.AddHours(23);
             var res = await _adminPanelService.BusinessStatus(val);
             return View(res);
         }
@@ -277,6 +278,7 @@ namespace WebService.Controllers
             FromToDate val = new FromToDate();
             val.FromDateTime = DateTime.Parse(valf);
             val.ToDateTime = DateTime.Parse(valt);
+            val.ToDateTime.AddHours(23);
 
             var lst = await _adminPanelService.CostStatus(val);
             var res = new DailyCostStatus();

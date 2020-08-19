@@ -23,7 +23,7 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label class="mb-1" for="inbox">Barcode Product</label>
-                    <input class="form-control" placeholder="Product Id" id="inbox" />
+                    <input class="form-control" placeholder="Product Id" id="inbox" autofocus="true"/>
                 </div>
             </div>
             <div class="col-md-6">
@@ -133,6 +133,8 @@
                     trHTML += '<tr class="eachItem" type="non-bar" id="'+response.res.id+'"><td class="text-center productName">' + response.res.productTitle + '</td><td class="text-center amountSelect">'+amount+'</td><td class="text-center unitProductPrice">' + response.res.sellingPrice + '</td><td class="text-center productPrice">'+ (parseFloat(response.res.sellingPrice) * parseFloat(amount)).toFixed(1) +'</td><td class="text-center"><button onclick="javascript: removeRow(this)" class="deleteIcon btn btn-danger">Remove</button></td></tr>';
                     $('#productToBeSold').append(trHTML);
                     //array.push(response.res.id);
+                    $('#payment').val(getTotalPrice());
+                    
                     $('#total').text(getTotalPrice());
                     $('#due').text(getDue());
                 }
@@ -185,6 +187,7 @@
                             $('#productToBeSold').append(trHTML);
                             //array.push(response.res.id);
                             $('#total').text(getTotalPrice());
+                            $('#payment').val(getTotalPrice());
                             $('#due').text(getDue());
                         }
                         else {
@@ -203,13 +206,16 @@
     $('#discount').keyup(function(e) {
         if (e.keyCode == 13) {
             $('#total').text(getTotalPrice());
-            $("#due").text(getDue());
+            $('#payment').val(getTotalPrice());
+            $('#due').text(getDue());
         }
     });
     
     $('#discount').on('input', function() {
         $('#total').text(getTotalPrice());
+        $("")
         $("#due").text(getDue());
+        
     });
     
     $('#payment').on('input', function() {
@@ -228,6 +234,11 @@
         $("#due").text(getDue());
         if (getDue() < 0) {
             alert("Due cannot be negetive");
+            return;
+        }
+        var payment =  $("#payment").val();
+        if (getTotalPrice < getDue || payment > getTotalPrice || payment < 0) {
+            alert("Check Payment and Due Value");
             return;
         }
         

@@ -122,6 +122,10 @@
     }
 
     $('#checkout').click(function () {
+        if (getDue() < 0) {
+            alert("Due Amount Cannot be negetive");
+            return;
+        }
         $.ajax({
             type: "POST",
             url: '@Url.Action("PayDueAPi", "AdminPanel")',

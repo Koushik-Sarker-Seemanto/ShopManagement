@@ -178,6 +178,11 @@ namespace Services
             {
                 entry.Value.TotalProfit = entry.Value.TotalSell - entry.Value.TotalCost - entry.Value.TotalBuyingCost; 
                 res.dailyCalculations.Add( entry.Value);
+                res.TotalProfit += entry.Value.TotalProfit;
+                res.TotalCost += entry.Value.TotalCost;
+                res.TotalDue += entry.Value.TotalDue;
+                res.TotalSell += entry.Value.TotalSell;
+                res.TotalBuyingCost += entry.Value.TotalBuyingCost;
                 Debug.Print(entry.Value.TotalSell + " Total Sell");
             }
 

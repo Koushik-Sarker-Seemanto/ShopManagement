@@ -22,7 +22,7 @@
                     <tr>
                         @foreach (var day in @Model.DailyCosts)
                         {
-                            <td class="text-center">@day.date.Date.ToString()</td>
+                        <td class="text-center">@day.date.Date.Day / @day.date.Date.Month / @day.date.Date.Year </td>
 
                             <td class="text-center">@day.TotalCost</td>
                         }
