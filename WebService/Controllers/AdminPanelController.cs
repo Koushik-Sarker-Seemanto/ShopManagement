@@ -269,7 +269,7 @@ namespace WebService.Controllers
                 return View(dateRange);
             }
             Debug.Print(dateRange.ToDateTime.ToString() + " at controller");
-            return RedirectToAction("ProductSaleStatus", new { valf = dateRange.FromDateTime.ToString(), valt = dateRange.ToDateTime.ToString() });
+            return RedirectToAction("DailyCosting", new { valf = dateRange.FromDateTime.ToString(), valt = dateRange.ToDateTime.ToString() });
 
         }
 
