@@ -29,10 +29,14 @@ namespace Services
             {
                 var managers = await GetAllManager();
                 var sellers = await GetAllSeller();
+                var dateWiseIncome = await GetDateWiseIncome(DateTime.Now);
+                var topSoldProduct = await GetTopSoldProduct(DateTime.Now);
                 IndexViewModel indexViewModel = new IndexViewModel
                 {
                     Managers = managers,
                     Sellers = sellers,
+                    DateWiseIncomes = dateWiseIncome,
+                    TopSoldProduct = topSoldProduct,
                 };
                 return indexViewModel;
             }
@@ -41,6 +45,59 @@ namespace Services
                 _logger.LogError(ex, $"GetIndexData Failed {ex.Message}");
                 return null;
             }
+        }
+
+        private async Task<List<ProductSellRepeat>> GetTopSoldProduct(DateTime current)
+        {
+            var startDay = current.AddDays(-9).Date;
+            List<ProductSellRepeat> productSellRepeats = new List<ProductSellRepeat>();
+
+            var products = await this._repository.GetItemsAsync<IndividualProduct>(
+                e => e.SellDateTime > startDay && e.SellDateTime < current && e.Sold == true);
+            var categories = products.Select(e => e.CategoryId).Distinct();
+            foreach (var item in categories)
+            {
+                var repeat = products.Count(e => e.CategoryId == item);
+                var product = await this._repository.GetItemAsync<Product>(e => e.Id == item);
+                ProductSellRepeat sell = new ProductSellRepeat
+                {
+                    ProductId = product?.Id,
+                    ProductName = product?.Name,
+                    Repetition = repeat,
+                };
+                productSellRepeats.Add(sell);
+            }
+
+            productSellRepeats = productSellRepeats.OrderBy(e => e.Repetition).Take(10).ToList();
+            
+            return productSellRepeats;
+        }
+        
+        private async Task<List<DateWiseIncome>> GetDateWiseIncome(DateTime current)
+        {
+            List<DateWiseIncome> dateWiseIncomes = new List<DateWiseIncome>();
+            var startDay = current.AddDays(-9).Date;
+            var endDay = current.Date;
+            int p = 1;
+            _logger.LogInformation($"Date Startttttttttttttttttttttttttttttttttttttttt: ");
+            for (var i = startDay; i <= endDay; i = i.AddDays(1))
+            {
+                _logger.LogInformation($"Date: {p} -> {i}");
+                p++;
+                FromToDate temp = new FromToDate
+                {
+                    FromDateTime = i,
+                    ToDateTime = i.AddDays(1),
+                };
+                var result = await this.BusinessStatus(temp);
+                DateWiseIncome income = new DateWiseIncome
+                {
+                    Date = i,
+                    DayToDayCalculation = result,
+                };
+                dateWiseIncomes.Add(income);
+            }
+            return dateWiseIncomes;
         }
 
         public async Task<EmployeeDetailsViewModel> GetEmployeeDetails(string id)
