@@ -20,7 +20,7 @@ namespace WebService.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return RedirectToAction("Index", "AdminAuth");
         }
 
         public IActionResult Privacy()

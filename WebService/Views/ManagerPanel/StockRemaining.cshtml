@@ -3,19 +3,29 @@
     ViewData["Title"] = "StockRemaining";
     Layout = "_LayoutManager";
 }
-<div class="table-responsive">
-    <table class="table table-bordered" id="productTable" width="100%" cellspacing="0">
-        <thead>
-        <<tr class="text-center">
-            <th>Name</th>
-            <th>Stock Warning</th>
-            <th>Selling Price</th>
-            <th>Stock</th>
-            <th>Action Link</th>
-        </tr>
-        </thead>
+<h1 class="mt-4">Limited Stock Products</h1>
+<div class="card mb-4">
+    <div class="card-header" id="manager-table" style="cursor: pointer">
+        <i class="fas fa-table mr-1"></i>
+        Limited Stock Product Table
+        <i class="fas fa-caret-down float-right"></i>
+    </div>
+    <div class="card-body" id="manager-table-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="productTable" width="100%" cellspacing="0">
+                <thead>
+                <tr class="text-center">
+                    <th>Name</th>
+                    <th>Stock Warning</th>
+                    <th>Selling Price</th>
+                    <th>Stock</th>
+                    <th>Action Link</th>
+                </tr>
+                </thead>
                 
-    </table>
+            </table>
+        </div>
+    </div>
 </div>
 <script>
     $("#productTable").DataTable({
@@ -35,7 +45,7 @@
                 "className": "text-center",
             },
             {
-                "targets": [4],
+                "targets": [1, 2, 4],
                 "orderable": false,
             },
         ],
@@ -45,7 +55,7 @@
             { "data": "sellingPrice", "name": "Selling Price", "autoWidth": true },
             { "data": "stock", "name": "Stock", "autoWidth": true },
             {
-                "render": function (data, type, full, meta) { return '<a class="btn btn-info" href="ManagerPanel/ProductDetails?productId=' + full.id + '">Details</a>'; }
+                "render": function (data, type, full, meta) { return '<a class="btn btn-info" href="/ManagerPanel/ProductDetails?productId=' + full.id + '">Details</a>'; }
             },
         ]
 

@@ -29,15 +29,15 @@
 
     $(document).ready(function() {
         $('#managerDataTable').DataTable();
-//        $('#sellerDataTable').DataTable();
+        $('#sellerDataTable').DataTable();
     });
     
     $("#manager-table-header").click(function () {
         $("#manager-table-body").fadeToggle(500);
     });
-//    $("#seller-table-header").click(function () {
-//        $("#seller-table-body").fadeToggle(500);
-//    });
+    $("#seller-table-header").click(function () {
+        $("#seller-table-body").fadeToggle(500);
+    });
 
     $("#productDataTable").DataTable({
         "processing": true, // for show progress bar    
@@ -55,7 +55,7 @@
                 "className": "text-center",
             },
             {
-                "targets": [4],
+                "targets": [1, 4],
                 "orderable": false,
             },
         ],

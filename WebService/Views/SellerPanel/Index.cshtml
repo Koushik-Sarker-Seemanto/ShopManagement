@@ -4,14 +4,6 @@
     ViewBag.Index = true;
 }
 
-<div class="text-center">
-    <h1 class="display-1">Welcome to Seller Index Page!</h1>
-
-    @*<input placeholder="Product Id" id="inbox" />
-    <input placeholder="Name" id="name" />
-    <input placeholder="Phone Number" id="phone" />*@
-</div>
-
 <div id="content" class="card mb-4">
     <div class="card-header" id="manager-table-header" style="cursor: pointer">
         <i class="fas fa-table mr-1"></i>
@@ -35,10 +27,10 @@
                     <label class="mb-1" for="inbox-non-amount">Non Barcode Amount</label>
                     <input class="form-control" placeholder="Unit" value="1" id="inbox-non-amount" />
                 </div>
-                <button id="add-non-bar" class="btn btn-primary">Add</button>
+                <button id="add-non-bar" class="btn btn-primary">Add To Cart</button>
             </div>
         </div>
-        <div class="form-row">
+        <div class="form-row mt-4">
             <div class="col-md-6">
                 <div class="form-group">
                     <label class="mb-1" for="name">Customer Name</label>
@@ -53,13 +45,15 @@
             </div>
         </div>
     </div>
+    <h3 class="d-flex justify-content-center mt-2 mr-2 ml-2" style="background: #a29f9a; border-radius: 5px; padding: 10px"><b>Cart Details</b></h3>
+    
 
     @{
         await Html.RenderPartialAsync("_ProductTable");
     }
 </div>
 <div style="text-align: center">
-    <button class="btn btn-success" id="checkout"> Checkout </button>
+    <button class="customBtn-admin-primary text-white border-0" id="checkout"> Checkout </button>
 </div>
 
 <div id="elementH"></div>
@@ -86,8 +80,8 @@
                         else {
                             cb($.map( JSON.parse(response.res), function( item ) {
                                 return {
-                                  label: item,
-                                  value: item
+                                  label: item.Name+"("+item.Stock+")",
+                                  value: item.Name
                                 }
                             }));
                         }
@@ -172,7 +166,7 @@
 
                     $('#inbox').val('');
                     if (response.status === "Not Found") {
-                        alert("Product Not Found");
+                        alert("Product Not Found with this Barcode");
                     } else {
                         let exist = false;
                         $('tr.eachItem').each(function() {
@@ -191,7 +185,7 @@
                             $('#due').text(getDue());
                         }
                         else {
-                            alert("Product Already Added");
+                            alert("Product already exists in the cart!!!");
                         }
                     }
                 },
@@ -260,6 +254,12 @@
                 array.push(id);
             }
         });
+        if ( array.length === 0 && nonArray.length === 0){
+            alert("Trying to checkout empty cart!!!");
+            return false;
+        }
+        //alert(JSON.stringify(nonArray));
+        //console.log(array.length);
         // Loading Start
         Swal.fire({
             title: 'Loading',
@@ -296,11 +296,11 @@
                     $("#inbox").attr('disabled', 'disabled');
                     $("#inbox-non-barcode").attr('disabled', 'disabled');
                 } else {
-                    alert("Fail");
+                    alert("Fail to checkout!!!");
                 }
             },
             error: function (response) {
-                alert("Fail Req");
+                alert("Checkout request rejected by server!!!");
             }
         });
     });

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Models.Entities;
 using Models.SellerPanelModels;
 using Models.ViewModels.SellerPanel;
+using System.Linq.Dynamic.Core;
 using Newtonsoft.Json;
 using Services.Contracts;
 
@@ -248,7 +249,7 @@ namespace WebService.Controllers
                 // Paging Length 10,20  
                 var length = Request.Form["length"].FirstOrDefault();
                 // Sort Column Name  
-                var sortColumn = Request.Form["columns[" + Request.Form["order[0][column]"].FirstOrDefault() + "][name]"].FirstOrDefault();
+                var sortColumn = Request.Form["columns[" + Request.Form["order[0][column]"].FirstOrDefault() + "][data]"].FirstOrDefault();
                 logger.LogInformation($"sortColumn: {sortColumn}");
                 // Sort Column Direction ( asc ,desc)  
                 var sortColumnDirection = Request.Form["order[0][dir]"].FirstOrDefault();
@@ -264,20 +265,17 @@ namespace WebService.Controllers
                 // Getting all Customer data
                 var productData = _adminPanelService.GetAllDueOrders();
 
-
-
-                /// Todo: Sorting
-                /// 
-
                 // Sorting
-                // if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
-                // {
-                //     productData = productData.OrderBy(sortColumn + " " + sortColumnDirection);
-                // }
+                 if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
+                 {
+                     productData = productData.OrderBy(sortColumn + " " + sortColumnDirection);
+                 }
                 // Search
                 if (!string.IsNullOrEmpty(searchValue))
                 {
-                    productData = productData.Where(m => m.CustomerName.ToUpper().Contains(searchValue.ToUpper()));
+                    productData = productData.Where(m => m.CustomerName.ToUpper().Contains(searchValue.ToUpper()) 
+                                                         || m.CustomerPhone.Contains(searchValue)
+                                                         || m.Id.Contains(searchValue));
                 }
 
                 //total number of rows count   
