@@ -9,8 +9,33 @@
     <li class="breadcrumb-item active">Dashboard</li>
 </ol>
 <div class="text-center" style="background: #eeeeee">
-    <h1 class="display-2">TODO: Dashboard Charts</h1>
+	<h1 class="display-2">TODO: Dashboard Charts</h1>
+	
 </div>
+
+@*
+<div class="row">
+	<div class="col-xl-6">
+		<div class="card mb-4">
+			<div class="card-header">
+				<i class="fas fa-chart-area mr-1"></i>
+				Area Chart Example
+			</div>
+			<div class="card-body"><canvas id="myAreaChart" width="100%" height="40"></canvas></div>
+		</div>
+	</div>
+	<div class="col-xl-6">
+		<div class="card mb-4">
+			<div class="card-header">
+				<i class="fas fa-chart-bar mr-1"></i>
+				Bar Chart Example
+			</div>
+			<div class="card-body"><canvas id="barChartDiv" width="100%" height="40"></canvas></div>
+		</div>
+	</div>
+</div>
+*@
+
 
 @if (Model != null)
 {
@@ -18,3 +43,31 @@
     await Html.RenderPartialAsync("_ManagerTable", Model);
     await Html.RenderPartialAsync("_SellerTable", Model);
 }
+
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+
+<script>
+/*
+$(document).ready(function() {
+    var barChart = new CanvasJS.Chart("barChartDiv", {
+		title:{
+			text: "My First Chart in CanvasJS"              
+		},
+		data: [              
+		{
+			// Change type to "doughnut", "line", "splineArea", etc.
+			type: "column",
+			dataPoints: [
+				{ label: "apple",  y: 10  },
+				{ label: "orange", y: 15  },
+				{ label: "banana", y: 25  },
+				{ label: "mango",  y: 30  },
+				{ label: "grape",  y: 28  }
+			]
+		}
+		]
+	});
+	barChart.render();
+});*/
+
+</script>

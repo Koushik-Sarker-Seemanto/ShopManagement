@@ -53,7 +53,7 @@
     }
 </div>
 <div style="text-align: center">
-    <button class="customBtn-admin-primary text-white border-0" id="checkout"> Checkout </button>
+    <button class="btn btn-success pl-4 pr-4" id="checkout"> Checkout </button>
 </div>
 
 <div id="elementH"></div>
@@ -402,7 +402,7 @@
         $("#showInvoice").append(finalDom);
     }
     function newOrder() {
-        location.reload();
+        location.reload(true);
     }
     function downloadPDF() {
         var doc = new jsPDF('p', 'mm', [105.83, 296]);
