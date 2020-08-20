@@ -12,6 +12,8 @@
     <div class="card text-black mb-4">
         <div class="card-header text-center" style="background: #eeeeee"><h1>Product Details</h1></div>
         <div class="card-body p-5 bg-light">
+        @if (Model != null)
+        {
             <label for="name">Name</label>
             @if (@Model.Product.Name != null)
             {
@@ -21,46 +23,46 @@
             {
                 <p id="name" class="list-group-item">N/A</p>
             }
-            <br />
+            <br/>
             <label for="buyingPrice2">Buying Price</label>
             <p id="buyingPrice2" class="list-group-item">@Model.Unit.BuyingPrice</p>
-            <br />
+            <br/>
             <label for="buyingPrice2">Buying AT</label>
             <p id="buyingPrice2" class="list-group-item">@Model.Unit.CreatedAt</p>
-            <br />
+            <br/>
             <label for="sellingPrice">Selling Price</label>
             <p id="sellingPrice" class="list-group-item">@Model.Product.SellingPrice</p>
-            <br />
+            <br/>
 
             <label for="details">Sold</label>
             @if (@Model.Unit.Sold)
             {
                 <p id="details" class="list-group-item">Sold</p>
-                <br />
+                <br/>
                 <label for="sellingPrice">Sold At</label>
                 <p id="sellingPrice" class="list-group-item">@Model.Order.SoldAt</p>
-                <br />
+                <br/>
                 if (@Model.Order.CustomerName != null)
                 {
                     <label for="sellingPrice">Customer Name</label>
                     <p id="sellingPrice" class="list-group-item">@Model.Order.CustomerName</p>
-                    <br />
+                    <br/>
                 }
                 if (@Model.Order.CustomerPhone != null)
                 {
                     <label for="sellingPrice">Customer Phone</label>
                     <p id="sellingPrice" class="list-group-item">@Model.Order.CustomerPhone</p>
-                    <br />
+                    <br/>
                 }
                 <label for="sellingPrice">Given Discount </label>
                 <p id="sellingPrice" class="list-group-item">@Model.Order.Discount</p>
-                <br />
+                <br/>
                 <label for="sellingPrice">Total Price </label>
                 <p id="sellingPrice" class="list-group-item">@Model.Order.TotalPrice</p>
-                <br />
+                <br/>
                 <label for="sellingPrice"> Due Amount </label>
                 <p id="sellingPrice" class="list-group-item">@Model.Order.DueAmount</p>
-                <br />
+                <br/>
 
             }
             else
@@ -73,22 +75,26 @@
                     {
                         <br/>
                         <lable><u>Returned Customer </u> </lable>
-                        <br/><br/>
+                        <br/>
+                        <br/>
                         <label for="sellingPrice">Customer Name</label>
                         <p id="sellingPrice" class="list-group-item">@returnUnit.CustomerName</p>
-                        <br />
+                        <br/>
                         <label for="sellingPrice">Customer Phone</label>
                         <p id="sellingPrice" class="list-group-item">@returnUnit.CustomerPhone</p>
-                        <br />
+                        <br/>
                         <label for="sellingPrice">Return Date</label>
-                        <p id="sellingPrice" class="list-group-item">@returnUnit.ReturnTime.Date.Day / @returnUnit.ReturnTime.Date.Month / @returnUnit.ReturnTime.Date.Year   </p>
-                        <br />
+                        <p id="sellingPrice" class="list-group-item">@returnUnit.ReturnTime.Date.Day / @returnUnit.ReturnTime.Date.Month / @returnUnit.ReturnTime.Date.Year </p>
+                        <br/>
                     }
                 }
             }
-            <br />
-
-
+            <br/>
+        }
+        else
+        {
+            <h1>Ops!!! No product found with this id.</h1>
+        }
 
         </div>
 

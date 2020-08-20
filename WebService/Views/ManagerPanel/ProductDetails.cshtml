@@ -56,9 +56,9 @@
                 <form id="generateProductForm" method="get" style="margin-left: 5%; margin-right: 5%;margin-top:5% " asp-controller="ManagerPanel" asp-action="GenerateBarcode">
                     <label><b>Stock To Add</b></label>
 
-                    <input class="form-control py-4" id="stockId" name="stock" placeholder="Enter Stock Amount to Add">
+                    <input class="form-control py-4" type="number" id="stockId" name="stock" placeholder="Enter Stock Amount to Add">
                     <br />
-                    <input class="form-control py-4" id="buyingPrice" name="buyingPrice" placeholder="Enter Buying Price">
+                    <input class="form-control py-4" id="buyingPriceId" name="buyingPrice" placeholder="Enter Buying Price">
                     <input class="form-control py-4" id="productId" name="productId" style="visibility: hidden" value="@Model.Id">
                     <input id="generateProductBtn" type="submit" class="btn btn-success" value="Generate Product" />
                 </form>
@@ -94,7 +94,7 @@ $(document).ready(function() {
     $("#generateProductForm").submit(function(e) {
         e.preventDefault();
         let stockVal = $("#stockId").val();
-        let buyingPriceVal = $("#buyingPrice").val();
+        let buyingPriceVal = $("#buyingPriceId").val();
         let productIdVal = $("#productId").val();
         console.log(stockVal+" : "+buyingPriceVal+" : "+productIdVal);
         if (stockVal === "" || stockVal === undefined || buyingPriceVal === "" || 
@@ -129,6 +129,7 @@ $(document).ready(function() {
                     if (response.res === "NonBarCode") {
                         
                         alert("NonBarCode product added!");
+                        location.reload(true);
                         return false;
                     }
                     console.log("List Found");
