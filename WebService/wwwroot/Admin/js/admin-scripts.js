@@ -29,7 +29,7 @@
 
     $(document).ready(function() {
         $('#managerDataTable').DataTable();
-//        $('#sellerDataTable').DataTable();
+        $('#sellerDataTable').DataTable();
     });
     
     $("#manager-table-header").click(function () {
