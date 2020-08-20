@@ -33,7 +33,7 @@ namespace WebService
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
-                    options.LoginPath = "/AdminAuth/Login";
+                    options.LoginPath = "/Login";
                     options.AccessDeniedPath = "/AdminAuth/UnauthorizedPage/";
                     options.Cookie.Name = "UserLoginCookie";
                 });

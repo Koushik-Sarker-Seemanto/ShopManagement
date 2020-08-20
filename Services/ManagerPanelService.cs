@@ -40,6 +40,11 @@ namespace Services
             {
                 if (model != null)
                 {
+                    var exist = await _repository.GetItemAsync<Product>(d => d.Name == model.Name);
+                    if (exist != null)
+                    {
+                        return null;
+                    }
                     var guid = Guid.NewGuid().ToString();
                     var product = new Product
                     {
