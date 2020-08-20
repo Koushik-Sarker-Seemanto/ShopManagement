@@ -137,7 +137,7 @@ $(document).ready(function() {
                 swal.close();
                 if (response.status === "Success") {
                     alert("Product Successfully Returned!!!");
-                    location.reload(true);
+                    $(location).attr('href', 'http://168.119.61.248/SellerPanel'); 
                 } else {
                     if (response.errorMessage !== ""){
                         alert(response.errorMessage);
