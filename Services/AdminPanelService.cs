@@ -145,6 +145,12 @@ namespace Services
                     all[order.SoldAt.Date] = new DailyCalculation(order.SoldAt.Date);
                 }
 
+                foreach (var non in order.ProductNonBar)
+                {
+                    var nonBar = await ProductById(non.ItemId);
+                    all[order.SoldAt.Date].TotalBuyingCost += Convert.ToInt32(nonBar.BuyingPrice) * non.Amount;
+                }
+
                 all[order.SoldAt.Date].TotalSell += Convert.ToInt32(order.TotalPrice);
                 all[order.SoldAt.Date].TotalDue += Convert.ToInt32(order.DueAmount);
                 Debug.Print(all[order.SoldAt.Date].TotalSell + " TotAL Sell");

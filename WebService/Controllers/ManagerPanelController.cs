@@ -39,7 +39,30 @@ namespace WebService.Controllers
         {
             return View();
         }
-        
+
+        public async Task<IActionResult> EditProduct(string id)
+        {
+            var product = await _managerPanelService.FindProductViewModelById(id);
+            Debug.Print(product.Name + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+            return View(product);
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditProduct([Bind] ProductViewModel model)
+        {
+            if (ModelState.IsValid == false)
+            {
+                return View(model);
+            }
+            var result = await _managerPanelService.EditProduct(model);
+            logger.LogInformation($"Product: {JsonConvert.SerializeObject(model)}");
+            if (result != null)
+            {
+                return RedirectToAction("Index", "ManagerPanel");
+            }
+            ModelState.AddModelError("", "Invalid Product");
+            return View(model);
+        }
 
 
         [HttpPost]

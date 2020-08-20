@@ -48,9 +48,41 @@ namespace Services
                         StockWarning = model.StockWarning,
                         SellingPrice = model.SellingPrice,
                         Details = model.Details,
+                        BuyingPrice = model.BuyingPrice,
                         ProductType = model.ProductType,
                     };
                     await _repository.SaveAsync<Product>(product);
+                    return product;
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"AddProduct Failed: {ex.Message}");
+                return null;
+            }
+        }
+
+        public async Task<Product> EditProduct(ProductViewModel model)
+        {
+            try
+            {
+                if (model != null)
+                {
+                    
+                    // var guid = Guid.NewGuid().ToString();
+                    var product = new Product
+                    {
+                        Id = model.Id,
+                        Name = model.Name,
+                        StockWarning = model.StockWarning,
+                        SellingPrice = model.SellingPrice,
+                        BuyingPrice = model.BuyingPrice,
+                        Details = model.Details,
+                        ProductType = model.ProductType,
+                    };
+                    await _repository.UpdateAsync<Product>(d=>d.Id == model.Id,product);
                     return product;
                 }
 
@@ -71,6 +103,33 @@ namespace Services
                 {
                     var pro =  await _repository.GetItemAsync<Product>(d => d.Id == modelId);
                     return pro;
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"FindProductById Failed: {ex.Message}");
+                return null;
+            }
+        }
+        public async Task<ProductViewModel> FindProductViewModelById(string modelId)
+        {
+            try
+            {
+                if (modelId != null)
+                {
+                    var pro = await _repository.GetItemAsync<Product>(d => d.Id == modelId);
+                    var res = new ProductViewModel();
+                    res.Id = pro.Id;
+                    res.Name = pro.Name;
+                    res.SellingPrice = pro.SellingPrice;
+                    res.StockWarning = pro.StockWarning;
+                    res.Details = pro.Details;
+                    res.BuyingPrice = pro.BuyingPrice;
+                    res.ProductType = pro.ProductType;
+                    Debug.Print(res.Name + "aascccccccccccccccccccccc");
+                    return res;
                 }
 
                 return null;
@@ -136,68 +195,7 @@ namespace Services
         }
 
 
-        private void GenerateBarCode(List<string> productList, string title)
-        {
-            try
-            {
-                Dictionary<string, BaseEncodeType> collection = new Dictionary<string, BaseEncodeType>();
-                foreach (var item in productList)
-                {
-                    collection.Add(item, EncodeTypes.Code39Extended);
-                }
-                //collection.Add(productId, EncodeTypes.Code11);
-                List<Bitmap> images = new List<Bitmap>();
-
-                foreach (KeyValuePair<string, BaseEncodeType> pair in collection)
-                {
-                    BarcodeGenerator builder = new BarcodeGenerator(pair.Value, pair.Key);
-                    images.Add(builder.GenerateBarCodeImage());
-                    /*for (int i = 0; i < stock; i++)
-                    {
-                        BarcodeGenerator builder = new BarcodeGenerator(pair.Value, pair.Key);
-                        images.Add(builder.GenerateBarCodeImage());
-                    }*/
-                }
-
-                int maxWidth = int.MinValue;
-                int sumHeight = 0;
-                foreach (Bitmap bmp in images)
-                {
-                    sumHeight += bmp.Height;
-                    if (maxWidth < bmp.Width)
-                        maxWidth = bmp.Width;
-                }
-
-                const int offset = 10;
-                Bitmap resultBitmap = new Bitmap(maxWidth + offset * 2, sumHeight + offset * images.Count);
-                using (Graphics g = Graphics.FromImage(resultBitmap))
-                {
-                    g.Clear(Color.White);
-
-                    int yPosition = offset;
-                    Font drawFont = new Font("Arial", 16);
-                    SolidBrush drawBrush = new SolidBrush(Color.Black);
-                    // Todo: Fix Product Title Part
-                    g.DrawString("Product Name :  " + title, drawFont, drawBrush, offset, yPosition);
-                    yPosition += offset+20;
-                    for (int i = 0; i < images.Count; ++i)
-                    {
-                        Bitmap currentBitmap = images[i];
-                        g.DrawImage(currentBitmap, offset, yPosition);
-                        yPosition += currentBitmap.Height + offset;
-                    }
-                }
-
-                var name =  title+" "+ DateTime.Now.ToString("MMMM dd HH-mm tt") + ".png";
-                
-                resultBitmap.Save($"wwwroot/images/" + name, ImageFormat.Png);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"GenerateBarCode Failed : {e.Message}");
-            }
-        }
-
+        
         public IQueryable<Product> GetAllProducts()
         {
             try

@@ -1,18 +1,22 @@
-@model Models.ManagerPanelModels.ProductViewModel
+﻿@model Models.ManagerPanelModels.ProductViewModel
 @{
-    ViewData["Title"] = "Add Product";
+    ViewData["Title"] = "Edit Product";
     Layout = "_LayoutManager";
 }
-
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-lg-7">
             <div class="card shadow-lg border-0 rounded-lg mt-5">
-                <div class="card-header"><h3 class="text-center font-weight-light my-4">Add Product</h3></div>
+                <div class="card-header"><h3 class="text-center font-weight-light my-4">Edit Product</h3></div>
                 <div class="card-body">
-                    @Html.ValidationSummary(true, "", new {@class = "text-danger alert alert-danger"})
-                    <form id="addProductForm" asp-action="AddProduct" class="" autocomplete="off">
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger alert alert-danger" })
+                    <form id="addProductForm" asp-action="EditProduct" class="" autocomplete="off">
                         @Html.AntiForgeryToken()
+                        <div class="form-group" style="visibility: hidden">
+                            <label class="small mb-1" for="name">Name</label>
+                            <input asp-for="Id" class="form-control py-4" id="id" type="text">
+                            <span asp-validation-for="Id" class="text-danger"></span>
+                        </div>
                         <div class="form-group">
                             <label class="small mb-1" for="name">Name</label>
                             <input asp-for="Name" class="form-control py-4" id="name" type="text" placeholder="Enter Name">

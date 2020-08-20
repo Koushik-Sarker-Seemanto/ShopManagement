@@ -12,6 +12,8 @@ namespace Models.Entities
         public string Name { get; set; }
         [BsonRequired]
         public double SellingPrice { get; set; }
+        [BsonRequired]
+        public double BuyingPrice { get; set; }
 
         public string ProductType { get; set; }
         

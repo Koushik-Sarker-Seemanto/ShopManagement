@@ -11,6 +11,8 @@ namespace Models.ManagerPanelModels
         public string ProductType { get; set; }
         [Required]
         public double SellingPrice { get; set; }
+        [Required]
+        public double BuyingPrice { get; set; }
         
         public int StockWarning { get; set; }
         public string Details { get; set; }

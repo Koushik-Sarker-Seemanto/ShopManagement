@@ -27,17 +27,21 @@
                 {
                     <p id="name" class="list-group-item">N/A</p>
                 }
-                <br/>
+                <br />
                 <label for="buyingPrice2">Stock Warning Amount</label>
                 <p id="buyingPrice2" class="list-group-item">@Model.StockWarning</p>
-                <br/>
+                <br />
                 <label for="sellingPrice">Selling Price</label>
                 <p id="sellingPrice" class="list-group-item">@Model.SellingPrice</p>
-                <br/>
+                <br />
+                <br />
+                <label for="buyingPricePrice">Buying Price</label>
+                <p id="buyingPrice" class="list-group-item">@Model.BuyingPrice</p>
+                <br />
                 <label for="stock">Stock</label>
                 <p id="stock" class="list-group-item">@Model.Stock</p>
-                <br/>
-                
+                <br />
+
                 <label for="details">Description</label>
                 @if (@Model.Details != null)
                 {
@@ -47,19 +51,19 @@
                 {
                     <p id="details" class="list-group-item">N/A</p>
                 }
-                <br/>
+                <br />
 
                 <form id="generateProductForm" method="get" style="margin-left: 5%; margin-right: 5%;margin-top:5% " asp-controller="ManagerPanel" asp-action="GenerateBarcode">
                     <label><b>Stock To Add</b></label>
-                
+
                     <input class="form-control py-4" id="stockId" name="stock" placeholder="Enter Stock Amount to Add">
-                    <br/>
+                    <br />
                     <input class="form-control py-4" id="buyingPrice" name="buyingPrice" placeholder="Enter Buying Price">
                     <input class="form-control py-4" id="productId" name="productId" style="visibility: hidden" value="@Model.Id">
-                    <input id="generateProductBtn" type="submit" class="btn btn-success" value="Generate Product"/>
+                    <input id="generateProductBtn" type="submit" class="btn btn-success" value="Generate Product" />
                 </form>
-                
-                
+
+
             </div>
             
         </div>
