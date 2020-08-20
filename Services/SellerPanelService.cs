@@ -208,6 +208,7 @@ namespace Services
             {
                 if (model?.Order != null)
                 {
+                    var id = Guid.NewGuid().ToString();
                     foreach (var item in model.Order)
                     {
                         var individualProduct = await _repository.GetItemAsync<IndividualProduct>(d => d.Id == item && d.Sold == true);
@@ -234,6 +235,11 @@ namespace Services
                             }
                             
                             individualProduct.Sold = false;
+                            if (individualProduct.ReturnIdList == null)
+                            {
+                                individualProduct.ReturnIdList = new List<string>();
+                            }
+                            individualProduct.ReturnIdList.Add(id);
                             individualProduct.OrderId = String.Empty;
                             await _repository.UpdateAsync<IndividualProduct>(
                                 e => e.Id == individualProduct.Id, individualProduct);
@@ -245,7 +251,7 @@ namespace Services
                     }
                     ReturnProduct returnProduct = new ReturnProduct
                     {
-                        Id = Guid.NewGuid().ToString(),
+                        Id = id,
                         Products = model.Order,
                         CustomerName = model.Name,
                         CustomerPhone = model.Phone,
@@ -279,22 +285,12 @@ namespace Services
             }
         }
 
-        public async Task<ProductDetails> GetAllDetail(ProductIdInput product)
+       
+
+        public async Task<ReturnProduct> GetReturnProduct(string id)
         {
-            var indi = await GetIndividualProductById(product.ProductId);
-            var res = new ProductDetails();
-            res.Unit = indi;
-            res.Product = await GetProductById(indi.CategoryId);
-            if (res.Unit.Sold)
-            {
-                res.Order = await GetOrderById(indi.OrderId);
-            }
-
-            return res;
-
-
+            return await _repository.GetItemAsync<ReturnProduct>(d => d.Id == id);
         }
-
         public async Task<IndividualProduct> GetIndividualProductById(string id)
         {
             return await _repository.GetItemAsync<IndividualProduct>(d => d.Id == id);
@@ -306,6 +302,53 @@ namespace Services
         public async Task<Order> GetOrderById(string id)
         {
             return await _repository.GetItemAsync<Order>(d => d.Id == id);
+        }
+
+        public async Task<ProductDetails> ProductDetailWithReturn(ProductIdInput product)
+        {
+           
+                var indi = await GetIndividualProductById(product.ProductId);
+                var res = new ProductDetails();
+                res.Unit = buildIndividualProductView(indi);
+                res.Product = await GetProductById(indi.CategoryId);
+                if (indi.Sold)
+                {
+                    res.Order = await GetOrderById(indi.OrderId);
+                }
+
+                if (indi.ReturnIdList != null)
+                {
+                    foreach (var returnL in indi.ReturnIdList)
+                    {
+                        var ret = await GetReturnProduct(returnL);
+                        var retView = new ReturnUnitView();
+                        retView.Id = ret.Id;
+                        retView.CustomerName = ret.CustomerPhone;
+                        retView.CustomerPhone = ret.CustomerPhone;
+                        retView.ReturnTime = ret.ReturnAt;
+                        res.Unit.ReturnIdList.Add(retView);
+                    }
+                }
+
+                return res;
+
+
+            
+        }
+
+        private IndividualProductView buildIndividualProductView(IndividualProduct product)
+        {
+            var res = new IndividualProductView();
+            res.Id = product.Id;
+            res.CategoryId = product.CategoryId;
+            res.CreatedAt = product.CreatedAt;
+            res.BuyingPrice = product.BuyingPrice;
+            res.SellDateTime = product.SellDateTime;
+            res.OrderId = product.OrderId;
+            res.Sold = product.Sold;
+            res.SellingPrice = product.SellingPrice;
+            res.ReturnIdList = new List<ReturnUnitView>();
+            return res;
         }
     }
 }

@@ -37,9 +37,9 @@
             {
                 <p id="details" class="list-group-item">Sold</p>
                 <br />
-                 <label for="sellingPrice">Sold At</label>
-                 <p id="sellingPrice" class="list-group-item">@Model.Order.SoldAt</p>
-                 <br />
+                <label for="sellingPrice">Sold At</label>
+                <p id="sellingPrice" class="list-group-item">@Model.Order.SoldAt</p>
+                <br />
                 if (@Model.Order.CustomerName != null)
                 {
                     <label for="sellingPrice">Customer Name</label>
@@ -66,6 +66,25 @@
             else
             {
                 <p id="details" class="list-group-item">Not Sold</p>
+                if (@Model.Unit.ReturnIdList != null)
+                {
+
+                    foreach (var returnUnit in @Model.Unit.ReturnIdList)
+                    {
+                        <br/>
+                        <lable><u>Returned Customer </u> </lable>
+                        <br/><br/>
+                        <label for="sellingPrice">Customer Name</label>
+                        <p id="sellingPrice" class="list-group-item">@returnUnit.CustomerName</p>
+                        <br />
+                        <label for="sellingPrice">Customer Phone</label>
+                        <p id="sellingPrice" class="list-group-item">@returnUnit.CustomerPhone</p>
+                        <br />
+                        <label for="sellingPrice">Return Date</label>
+                        <p id="sellingPrice" class="list-group-item">@returnUnit.ReturnTime.Date.Day / @returnUnit.ReturnTime.Date.Month / @returnUnit.ReturnTime.Date.Year   </p>
+                        <br />
+                    }
+                }
             }
             <br />
 

@@ -178,6 +178,11 @@ namespace Services
             {
                 entry.Value.TotalProfit = entry.Value.TotalSell - entry.Value.TotalCost - entry.Value.TotalBuyingCost; 
                 res.dailyCalculations.Add( entry.Value);
+                res.TotalProfit += entry.Value.TotalProfit;
+                res.TotalCost += entry.Value.TotalCost;
+                res.TotalDue += entry.Value.TotalDue;
+                res.TotalSell += entry.Value.TotalSell;
+                res.TotalBuyingCost += entry.Value.TotalBuyingCost;
                 Debug.Print(entry.Value.TotalSell + " Total Sell");
             }
 
@@ -290,6 +295,32 @@ namespace Services
             order.DueAmount = dueAmount;
             await _repository.UpdateAsync<Order>(d => d.Id == orderId, order);
             return true;
+        }
+
+        public async Task<List<DayToDayCost>> CostStatus(FromToDate date)
+        {
+            var costs = await CostInDateRange(date);
+            var res = new List<DayToDayCost>();
+            Dictionary<string,DayToDayCost> dictionary = new Dictionary<string, DayToDayCost>();
+            foreach (var cost in costs)
+            {
+                if (!dictionary.ContainsKey(cost.CreatedAt.Date.ToString()))
+                {
+                    var daily = new DayToDayCost();
+                    dictionary[cost.CreatedAt.Date.ToString()] = daily;
+                    dictionary[cost.CreatedAt.Date.ToString()].TotalCost = 0;
+                }
+
+                dictionary[cost.CreatedAt.Date.ToString()].date = cost.CreatedAt.Date;
+                dictionary[cost.CreatedAt.Date.ToString()].TotalCost += cost.Amount;
+            }
+            List<DayToDayCost> list = new List<DayToDayCost>();
+            foreach (KeyValuePair<string, DayToDayCost> entry in dictionary)
+            {
+                list.Add(entry.Value);
+            }
+
+            return list;
         }
     }
 }

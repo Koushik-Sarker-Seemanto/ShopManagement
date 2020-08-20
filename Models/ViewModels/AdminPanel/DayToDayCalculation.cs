@@ -6,7 +6,21 @@ namespace Models.ViewModels.AdminPanel
 {
     public class DayToDayCalculation
     {
+        public DayToDayCalculation()
+        {
+            // day = days;
+            TotalBuyingCost = 0;
+            TotalCost = 0;
+            TotalDue = 0;
+            TotalSell = 0;
+            TotalProfit = 0;
+        }
         public List<DailyCalculation> dailyCalculations { get; set; }
+        public int TotalSell { get; set; }
+        public int TotalBuyingCost { get; set; }
+        public int TotalCost { get; set; }
+        public int TotalProfit { get; set; }
+        public int TotalDue { get; set; }
     }
 
     public class DailyCalculation

@@ -1,7 +1,7 @@
 ﻿@model Models.ViewModels.AdminPanel.OrderViewModel
 @{
     ViewData["Title"] = "Pay Due";
-    Layout = "_LayoutAdmin";
+    Layout = "_LayoutSeller";
 }
 
 <h1>Order Detailes</h1>
@@ -126,9 +126,15 @@
             alert("Due Amount Cannot be negetive");
             return;
         }
+        Swal.fire({
+            title: 'Loading',
+            text: 'Please Wait...',
+            showCancelButton: false,
+            showConfirmButton: false
+        });
         $.ajax({
             type: "POST",
-            url: '@Url.Action("PayDueAPi", "AdminPanel")',
+            url: '@Url.Action("PayDueAPi", "SellerPanel")',
             datatype: "json",
             data: {
                 due: getDue(),
@@ -137,7 +143,8 @@
             success: function (response) {
                 if (response.status === "Success") {
                     $("#showInvoice").attr('name', response.orderId);
-                    alert("OK");
+                   
+                    swal.close();
                     createInvoice();
                     $("#payment").attr('disabled', 'disabled');
                 } else {
