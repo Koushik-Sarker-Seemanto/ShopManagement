@@ -1,0 +1,176 @@
+
+@{
+    ViewBag.Title = "Product Return";
+    Layout = "_LayoutSeller";
+    ViewBag.Index = false;
+}
+
+
+<div class="card mt-2 mb-4">
+    <div class="card-header" id="manager-table-header" style="cursor: pointer">
+        <i class="fas fa-table mr-1"></i>
+        Product Return
+        <i class="fas fa-caret-down float-right"></i>
+    </div>
+    <div class="card-body">
+        <div class="form-row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="mb-1" for="inbox">Product Id</label>
+                    <input class="form-control" placeholder="Product Id" id="inbox" />
+                </div>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="mb-1" for="name">Customer Name</label>
+                    <input class="form-control" placeholder="Name" id="name" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="mb-1" for="phone">Customer Phone</label>
+                    <input class="form-control" placeholder="Phone Number" id="phone" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @{
+        await Html.RenderPartialAsync("_ProductTable");
+    }
+</div>
+
+<div style="text-align: center">
+    <button class="btn btn-success" id="returnProductBtn"> Return Product </button>
+</div>
+
+
+<script>
+
+$(document).ready(function() {
+    
+    $('#inbox').keyup(function(e) {
+        if (e.keyCode == 13) {
+            //your code
+            let productId = $("#inbox").val();
+            Swal.fire({
+                title: 'Loading',
+                text: 'Please Wait...',
+                showCancelButton: false,
+                showConfirmButton: false
+            });
+
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetProduct", "SellerPanel")',
+                contentType: "application/json; charset=utf-8",
+                data: {
+                    //Passing Input parameter
+                    id: productId,
+                    returnProduct: true,
+                },
+                success: function (response) {
+                    swal.close();
+                    var json_response = JSON.stringify(response);
+
+                    $('#inbox').val('');
+                    if (response.status === "Not Found") {
+                        alert("Product Not Found");
+                    } else {
+                        let exist = false;
+                        $('tr.eachItem').each(function() {
+                            let id = $(this).attr('id');
+                            if (id === response.res.id){
+                                exist = true;
+                            }
+                        });
+                        if (exist === false){
+                            var trHTML = '';
+                            trHTML += '<tr class="eachItem" type="bar" id="'+response.res.id+'"><td class="text-center productName">' + response.res.productTitle + '</td><td class="text-center amountSelect">1</td><td class="text-center unitProductPrice">' + response.res.sellingPrice + '</td><td class="text-center productPrice">'+ response.res.sellingPrice +'</td><td class="text-center"><button onclick="javascript: removeRow(this)" class="deleteIcon btn btn-danger">Remove</button></td></tr>';
+                            $('#productToBeSold').append(trHTML);
+                            //array.push(response.res.id);
+                            $('#total').text(getTotalPrice());
+                            //$('#due').text(getDue());
+                        }
+                        else {
+                            alert("Product Already Added");
+                        }
+                    }
+                },
+                error: function (response) {
+                    alert(response);
+                }
+            });
+        }
+    });
+    
+    
+    $('#returnProductBtn').click(function () {
+        $('#total').text(getTotalPrice());
+        
+        let array = [];
+        $('tr.eachItem').each(function() {
+            let id = $(this).attr('id');
+            array.push(id);
+        });
+        Swal.fire({
+            title: 'Loading',
+            text: 'Please Wait...',
+            showCancelButton: false,
+            showConfirmButton: false
+        });
+        //console.log(array.length);
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("ReturnProducts", "SellerPanel")',
+            datatype: "json",
+            data: {
+                //Passing Input parameter
+                name: $('#name').val(),
+                phone: $('#phone').val(),
+                totalAmount: getTotalPrice(),
+                order: JSON.stringify(array),
+            },
+            success: function (response) {
+                swal.close();
+                if (response.status === "Success") {
+                    alert("Product Successfully Returned!!!");
+                    location.reload(true);
+                } else {
+                    if (response.errorMessage !== ""){
+                        alert(response.errorMessage);
+                    }
+                    else{
+                        alert("Fail to return product");
+                    }
+                }
+            },
+            error: function (response) {
+                alert("Error response");
+            }
+        });
+    });
+    
+});
+
+function removeRow(e) {
+    $(e).closest('tr').remove();
+    let price = getTotalPrice();
+    $("#total").text(price);
+    //$("#due").text(getDue());
+}
+
+function getTotalPrice() {
+    let totalPrice = 0.00;
+    $('tr.eachItem').each(function() {
+        let price = $(this).find('td.productPrice').text();
+        totalPrice = (parseFloat(totalPrice) + parseFloat(price)).toFixed(1);
+    });
+    //let discount = $("#discount").val();
+    //totalPrice = (parseFloat(totalPrice) - parseFloat(discount)).toFixed(1);
+    return totalPrice;
+}
+
+</script>

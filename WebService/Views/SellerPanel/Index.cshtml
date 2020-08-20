@@ -1,0 +1,417 @@
+@{
+    ViewData["Title"] = "Seller Index";
+    Layout = "_LayoutSeller";
+    ViewBag.Index = true;
+}
+
+<div id="content" class="card mb-4">
+    <div class="card-header" id="manager-table-header" style="cursor: pointer">
+        <i class="fas fa-table mr-1"></i>
+        Product Invoice
+        <i class="fas fa-caret-down float-right"></i>
+    </div>
+    <div class="card-body">
+        <div class="form-row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="mb-1" for="inbox">Barcode Product</label>
+                    <input class="form-control" placeholder="Product Id" id="inbox" autofocus="true"/>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="mb-1" for="inbox-non-barcode">Non Barcode Product</label>
+                    <input class="form-control autocomplete" placeholder="Product Name" id="inbox-non-barcode" />
+                </div>
+                <div class="form-group">
+                    <label class="mb-1" for="inbox-non-amount">Non Barcode Amount</label>
+                    <input class="form-control" placeholder="Unit" value="1" id="inbox-non-amount" />
+                </div>
+                <button id="add-non-bar" class="btn btn-primary">Add To Cart</button>
+            </div>
+        </div>
+        <div class="form-row mt-4">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="mb-1" for="name">Customer Name</label>
+                    <input class="form-control" placeholder="Name" id="name" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="mb-1" for="phone">Customer Phone</label>
+                    <input class="form-control" placeholder="Phone Number" id="phone" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <h3 class="d-flex justify-content-center mt-2 mr-2 ml-2" style="background: #a29f9a; border-radius: 5px; padding: 10px"><b>Cart Details</b></h3>
+    
+
+    @{
+        await Html.RenderPartialAsync("_ProductTable");
+    }
+</div>
+<div style="text-align: center">
+    <button class="customBtn-admin-primary text-white border-0" id="checkout"> Checkout </button>
+</div>
+
+<div id="elementH"></div>
+
+<div class="container m-auto" id="showInvoice"></div>
+
+
+<script>
+
+    $(function() {
+        $("#inbox-non-barcode").autocomplete({
+            source: function(request, cb) {
+                $.ajax({
+                    type: "GET",
+                    url: '@Url.Action("GetProductByName", "SellerPanel")',
+                    contentType: "application/json; charset=utf-8",
+                    data: {
+                        query: request.term,
+                    },
+                    success: function(response) {
+                        if (response.status === "Not Found"){
+                            console.log("List Not Found");
+                        }
+                        else {
+                            cb($.map( JSON.parse(response.res), function( item ) {
+                                return {
+                                  label: item.Name+"("+item.Stock+")",
+                                  value: item.Name
+                                }
+                            }));
+                        }
+                    },
+                    error: function() {
+                        console.log("Error!!! List Not Found")
+                    },
+                });
+            }
+        });
+    });
+
+    $("#add-non-bar").click(function() {
+        let productName = $("#inbox-non-barcode").val();
+        let amount = $("#inbox-non-amount").val();
+        if (productName === "" || productName === undefined){
+            alert("Invalid Product Name");
+            return false;
+        }
+        if (amount === "" || amount === undefined){
+            alert("Invalid Amount");
+            return false;
+        }
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetProductNonBarCode", "SellerPanel")',
+            contentType: "application/json; charset=utf-8",
+            data: {
+                //Passing Input parameter
+                name: productName,
+                quantity: amount,
+            },
+            success: function (response) {
+                var json_response = JSON.stringify(response);
+
+                $('#inbox-non-barcode').val('');
+                $('#inbox-non-amount').val('1');
+                if (response.status === "Not Found") {
+                    alert("Product Not Found");
+                }
+                else {
+                    var trHTML = '';
+                    trHTML += '<tr class="eachItem" type="non-bar" id="'+response.res.id+'"><td class="text-center productName">' + response.res.productTitle + '</td><td class="text-center amountSelect">'+amount+'</td><td class="text-center unitProductPrice">' + response.res.sellingPrice + '</td><td class="text-center productPrice">'+ (parseFloat(response.res.sellingPrice) * parseFloat(amount)).toFixed(1) +'</td><td class="text-center"><button onclick="javascript: removeRow(this)" class="deleteIcon btn btn-danger">Remove</button></td></tr>';
+                    $('#productToBeSold').append(trHTML);
+                    //array.push(response.res.id);
+                    $('#payment').val(getTotalPrice());
+                    
+                    $('#total').text(getTotalPrice());
+                    $('#due').text(getDue());
+                }
+            },
+            error: function (response) {
+                alert(response);
+            }
+        });
+    });
+
+    //751f5413-abe1-4624-b646-a2d67c87a8bc
+    //0bb55003-b095-44af-af58-db5c6f1c7a7a
+    $('#inbox').keyup(function(e) {
+        if (e.keyCode == 13) {
+            //your code
+            Swal.fire({
+                title: 'Loading',
+                text: 'Please Wait...',
+                showCancelButton: false,
+                showConfirmButton: false
+            });
+            let productId = $("#inbox").val();
+
+            $.ajax({
+                type: "GET",
+                url: '@Url.Action("GetProduct", "SellerPanel")',
+                contentType: "application/json; charset=utf-8",
+                data: {
+                    //Passing Input parameter
+                    id: productId
+                },
+                success: function (response) {
+                    swal.close();
+                    var json_response = JSON.stringify(response);
+
+                    $('#inbox').val('');
+                    if (response.status === "Not Found") {
+                        alert("Product Not Found with this Barcode");
+                    } else {
+                        let exist = false;
+                        $('tr.eachItem').each(function() {
+                            let id = $(this).attr('id');
+                            if (id === response.res.id){
+                                exist = true;
+                            }
+                        });
+                        if (exist === false){
+                            var trHTML = '';
+                            trHTML += '<tr class="eachItem" type="bar" id="'+response.res.id+'"><td class="text-center productName">' + response.res.productTitle + '</td><td class="text-center amountSelect">1</td><td class="text-center unitProductPrice">' + response.res.sellingPrice + '</td><td class="text-center productPrice">'+ response.res.sellingPrice +'</td><td class="text-center"><button onclick="javascript: removeRow(this)" class="deleteIcon btn btn-danger">Remove</button></td></tr>';
+                            $('#productToBeSold').append(trHTML);
+                            //array.push(response.res.id);
+                            $('#total').text(getTotalPrice());
+                            $('#payment').val(getTotalPrice());
+                            $('#due').text(getDue());
+                        }
+                        else {
+                            alert("Product already exists in the cart!!!");
+                        }
+                    }
+                },
+                error: function (response) {
+                    alert(response);
+                }
+            });
+        }
+    });
+
+
+    $('#discount').keyup(function(e) {
+        if (e.keyCode == 13) {
+            $('#total').text(getTotalPrice());
+            $('#payment').val(getTotalPrice());
+            $('#due').text(getDue());
+        }
+    });
+    
+    $('#discount').on('input', function() {
+        $('#total').text(getTotalPrice());
+        $("")
+        $("#due").text(getDue());
+        
+    });
+    
+    $('#payment').on('input', function() {
+        $("#due").text(getDue());
+    });
+
+    function removeRow(e) {
+        $(e).closest('tr').remove();
+        let price = getTotalPrice();
+        $("#total").text(price);
+        $("#due").text(getDue());
+    }
+
+    $('#checkout').click(function () {
+        $('#total').text(getTotalPrice());
+        $("#due").text(getDue());
+        if (getDue() < 0) {
+            alert("Due cannot be negetive");
+            return;
+        }
+        var payment =  $("#payment").val();
+        if (getTotalPrice < getDue || payment > getTotalPrice || payment < 0) {
+            alert("Check Payment and Due Value");
+            return;
+        }
+        
+        let array = [];
+        let nonArray = [];
+        $('tr.eachItem').each(function() {
+            let check = $(this).attr('type');
+            if (check === "non-bar"){
+                let id = $(this).attr('id');
+                let amount = $(this).find('.amountSelect').text();
+                let nonBar = {
+                    "ItemId": id,
+                    "Amount": amount,
+                };
+                nonArray.push(nonBar)
+            }
+            else{
+                let id = $(this).attr('id');
+                array.push(id);
+            }
+        });
+        if ( array.length === 0 && nonArray.length === 0){
+            alert("Trying to checkout empty cart!!!");
+            return false;
+        }
+        //alert(JSON.stringify(nonArray));
+        //console.log(array.length);
+        // Loading Start
+        Swal.fire({
+            title: 'Loading',
+            text: 'Please Wait...',
+            showCancelButton: false,
+            showConfirmButton: false
+        });
+        
+        //$("#loader").show(); // shows the loading screen
+        
+        $.ajax({
+            type: "POST",
+            url: '@Url.Action("SellProduct", "SellerPanel")',
+            datatype: "json",
+            data: {
+                //Passing Input parameter
+                name: $('#name').val(),
+                phone: $('#phone').val(),
+                totalAmount: getTotalPrice(),
+                discount: $("#discount").val(),
+                due: getDue(),
+                order: JSON.stringify(array),
+                orderNonBar: JSON.stringify(nonArray),
+            },
+            success: function (response) {
+                if (response.status === "Success") {
+                    $("#showInvoice").attr('name', response.orderId);
+                    // Loading Off
+                    swal.close();
+
+                    createInvoice();
+                    $("#payment").attr('disabled', 'disabled');
+                    $("#discount").attr('disabled', 'disabled');
+                    $("#inbox").attr('disabled', 'disabled');
+                    $("#inbox-non-barcode").attr('disabled', 'disabled');
+                } else {
+                    alert("Fail to checkout!!!");
+                }
+            },
+            error: function (response) {
+                alert("Checkout request rejected by server!!!");
+            }
+        });
+    });
+    function getDue() {
+        let totalPrice = getTotalPrice();
+        let payment = $("#payment").val();
+        return (parseFloat(totalPrice) - parseFloat(payment)).toFixed(1);
+    }
+    function getTotalPrice() {
+        let totalPrice = 0.00;
+        $('tr.eachItem').each(function() {
+            let price = $(this).find('td.productPrice').text();
+            totalPrice = (parseFloat(totalPrice) + parseFloat(price)).toFixed(1);
+        });
+        let discount = $("#discount").val();
+        totalPrice = (parseFloat(totalPrice) - parseFloat(discount)).toFixed(1);
+        return totalPrice;
+    }
+
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js" integrity="sha512-s/XK4vYVXTGeUSv4bRPOuxSDmDlTedEpMEcAQk0t/FMd9V6ft8iXdwSBxV0eD60c6w/tjotSlKu9J2AAW1ckTA==" crossorigin="anonymous"></script>
+<script>
+
+
+    function createInvoice() {
+        let productList = [];
+        let buyerName = $("#name").val();
+        let buyerPhone = $("#phone").val();
+        if (buyerName === "" || buyerName === undefined){
+            buyerName = "N/A";
+        }
+        if (buyerPhone === "" || buyerPhone === undefined){
+            buyerPhone = "N/A";
+        }
+        let orderId = $("#showInvoice").attr('name');
+        
+        let domStart = `<div id="invoice-content" class="m-auto" style="width: 400px; background: white">
+                            <h1 class="d-flex justify-content-center" style="color: green">Invoice</h1>
+                            <p class="d-flex justify-content-center" >OrderId: ${orderId}</p><hr>
+                            <p id="name" class="list-group-item">Customer Name: ${buyerName}</p>
+                            <p id="name" class="list-group-item">Customer Phone: ${buyerPhone}</p>
+                            <br>
+                            <table class="table">
+                                <thead><th>Product</th><th>Qty</th><th>Unit$</th><th>Price$</th></thead>     
+                                <tbody>`;
+        let row = '';
+        $('tr.eachItem').each(function() {
+            let type =  $(this).attr('type');
+            if (type ==="bar"){
+                let name = $(this).find('td.productName').text();
+                let price = $(this).find('td.unitProductPrice').text();
+                let quantity = 1;
+                for( let i = 0; i < productList.length; i++){
+                    let prodName = productList[i].productName;
+                    if(prodName === name){
+                        quantity += 1;
+                        productList[i].productQuantity += parseInt(1);
+                    }
+                }
+                if (quantity === 1){
+                    productList.push({productName: name, productPrice: price, productQuantity: quantity});
+                }
+            }
+            else{
+                let name = $(this).find('td.productName').text();
+                let price = $(this).find('td.unitProductPrice').text();
+                let quantity = $(this).find('td.amountSelect').text();
+                productList.push({productName: name, productPrice: price, productQuantity: quantity});
+            }
+        });
+        
+        for( let i = 0; i < productList.length; i++){
+            let prodName = productList[i].productName;
+            let prodPrice = productList[i].productPrice;
+            let prodQuantity = productList[i].productQuantity;
+            row = row + `<tr><td>${prodName}</td> <td>${prodQuantity}</td> <td>${prodPrice}</td> <td>${prodPrice*prodQuantity}</td></tr>`;
+        }
+        
+        let discount = $("#discount").val();
+        let totalPrice = getTotalPrice();
+        let due = getDue();
+        let payment = $('#payment').val();
+        
+        let domEnd =        `<tr style="background: #eeeeee"><td colspan="3" class="text-right">Discount $</td><td>${discount}</td></tr>
+                             <tr style="background: #eeeeee"><td colspan="3" class="text-right">Total Price $</td><td>${totalPrice}</td></tr>
+                             <tr style="background: #eeeeee"><td colspan="3" class="text-right">Payment $</td><td>${payment}</td></tr>
+                             <tr style="background: #eeeeee"><td colspan="3" class="text-right">Due $</td><td>${due}</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3" style="text-align: center">
+                        <button class="btn btn-success" onclick="javascript: downloadPDF()"> Print Invoice </button>
+                        <button class="btn btn-danger" onclick="javascript: newOrder()"> Start New Order </button>
+                    </div>
+                    `;
+        let finalDom = domStart + row + domEnd;
+        $("#showInvoice").append(finalDom);
+    }
+    function newOrder() {
+        location.reload();
+    }
+    function downloadPDF() {
+        var doc = new jsPDF('p', 'mm', [105.83, 296]);
+        
+        doc.addHTML(document.getElementById('invoice-content'), function() {
+            //doc.save('invoice.pdf');
+            doc.autoPrint();
+            //This is a key for printing
+            doc.output('dataurlnewwindow');
+        });
+    }
+</script>

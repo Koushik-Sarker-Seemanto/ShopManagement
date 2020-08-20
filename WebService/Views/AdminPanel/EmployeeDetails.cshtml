@@ -1,0 +1,102 @@
+@model Models.ViewModels.AdminPanel.EmployeeDetailsViewModel;
+@{
+    ViewData["Title"] = "Employee";
+    Layout = "_LayoutAdmin";
+}
+
+@if (Model != null)
+{
+    if (Model.Employee != null)
+    {
+        <div class="col-lg-8 col-md-9 col-sm-12 pt-3 m-auto">
+            <div class="card text-black mb-4">
+                <div class="card-header text-center" style="background: #eeeeee"><h1>Employee Details</h1></div>
+                <div class="card-body p-5 bg-light">
+                    <label for="name">Name</label>
+                    @if (@Model.Employee.Name != null)
+                    {
+                        <p id="name" class="list-group-item">@Model.Employee.Name</p>
+                    }
+                    else
+                    {
+                        <p id="name" class="list-group-item">N/A</p>
+                    }
+                    <br/>
+                    <label for="phoneNo">Phone Number</label>
+                    @if (@Model.Employee.PhoneNo != null)
+                    {
+                        <p id="phoneNo" class="list-group-item">@Model.Employee.PhoneNo</p>
+                    }
+                    else
+                    {
+                        <p id="phoneNo" class="list-group-item">N/A</p>
+                    }
+                    <br/>
+                    <label for="email">Email</label>
+                    @if (@Model.Employee.Email != null)
+                    {
+                        <p id="email" class="list-group-item">@Model.Employee.Email</p>
+                    }
+                    else
+                    {
+                        <p id="email" class="list-group-item">N/A</p>
+                    }
+                    <br/>
+                    <label for="address">Address</label>
+                    @if (@Model.Employee.Address != null)
+                    {
+                        <p id="address" class="list-group-item">@Model.Employee.Address</p>
+                    }
+                    else
+                    {
+                        <p id="address" class="list-group-item">N/A</p>
+                    }
+                    <br/>
+                    <label for="role">Role</label>
+                    @if (@Model.Employee.Role != null)
+                    {
+                        <p id="role" class="list-group-item">@Model.Employee.Role</p>
+                    }
+                    else
+                    {
+                        <p id="role" class="list-group-item">N/A</p>
+                    }
+                    <br/>
+                    <label for="active">Active</label>
+                    @if (@Model.Employee.Active != null)
+                    {
+                        <p id="active" class="list-group-item">@Model.Employee.Active</p>
+                    }
+                    else
+                    {
+                        <p id="active" class="list-group-item">N/A</p>
+                    }
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="customBtn-admin-primary float-left text-white">Update</a>
+                    <a class="customBtn-admin-primary float-right text-white">Delete</a>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="col-md-6 pt-3 m-auto">
+            <div class="card text-black mb-4">
+                <div class="card-header text-center"><h1>Employee Details</h1></div>
+                <div class="card-body text-center">
+                    <h1> Not Found!</h1>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="text-center">
+        <h1>Model not found!</h1>
+    </div>
+}

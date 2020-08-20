@@ -1,0 +1,57 @@
+﻿@{
+    ViewData["Title"] = "Due Orders";
+    Layout = "_LayoutSeller";
+}
+<h1>@ViewData["Title"]</h1>
+
+<div class="table-responsive">
+    <table class="table table-bordered" id="orderTable" width="100%" cellspacing="0">
+        <thead>
+            
+            <tr class="text-center">
+                <th>Order Id</th>
+                <th>Customer Name</th>
+                <th>Customer Phone</th>
+                <th>Due Amount</th>
+                <th>Action Link</th>
+            </tr>
+        </thead>
+
+    </table>
+</div>
+<script>
+    $("#orderTable").DataTable({
+        "processing": true, // for show progress bar
+        "serverSide": true, // for process server side
+        "filter": true, // this is for disable filter (search box)
+        "orderMulti": false, // for disable multiple column at once
+        "ajax": {
+            "url": "/SellerPanel/Dues",
+            "type": "POST",
+            "datatype": "json"
+        },
+        "columnDefs": [
+            {
+                "targets": "_all",
+                "className": "text-center",
+            },
+            {
+                "targets": [4],
+                "orderable": false,
+            },
+        ],
+        "columns": [
+            { "data": "id", "name": "Order Id", "autoWidth": true },
+            { "data": "customerName", "name": "Customer Name", "autoWidth": true },
+            { "data": "customerPhone", "name": "Customer Phone", "autoWidth": true },
+            { "data": "dueAmount", "name": "Due Amount", "autoWidth": true },
+            {
+                "render": function (data, type, full, meta) { return '<a class="btn btn-info" href="PayDue?id=' + full.id + '">Pay Due</a>'; }
+            },
+        ]
+
+    });
+
+</script>
+
+

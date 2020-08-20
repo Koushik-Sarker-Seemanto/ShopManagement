@@ -1,0 +1,96 @@
+﻿@model Models.ViewModels.SellerPanel.ProductDetails
+@{
+    ViewData["Title"] = "ProductDetails";
+    Layout = "_LayoutSeller";
+}
+
+<h1>ProductDetails</h1>
+
+
+
+<div class="col-lg-8 col-md-9 col-sm-12 pt-3 m-auto">
+    <div class="card text-black mb-4">
+        <div class="card-header text-center" style="background: #eeeeee"><h1>Product Details</h1></div>
+        <div class="card-body p-5 bg-light">
+            <label for="name">Name</label>
+            @if (@Model.Product.Name != null)
+            {
+                <p id="name" class="list-group-item">@Model.Product.Name</p>
+            }
+            else
+            {
+                <p id="name" class="list-group-item">N/A</p>
+            }
+            <br />
+            <label for="buyingPrice2">Buying Price</label>
+            <p id="buyingPrice2" class="list-group-item">@Model.Unit.BuyingPrice</p>
+            <br />
+            <label for="buyingPrice2">Buying AT</label>
+            <p id="buyingPrice2" class="list-group-item">@Model.Unit.CreatedAt</p>
+            <br />
+            <label for="sellingPrice">Selling Price</label>
+            <p id="sellingPrice" class="list-group-item">@Model.Product.SellingPrice</p>
+            <br />
+
+            <label for="details">Sold</label>
+            @if (@Model.Unit.Sold)
+            {
+                <p id="details" class="list-group-item">Sold</p>
+                <br />
+                <label for="sellingPrice">Sold At</label>
+                <p id="sellingPrice" class="list-group-item">@Model.Order.SoldAt</p>
+                <br />
+                if (@Model.Order.CustomerName != null)
+                {
+                    <label for="sellingPrice">Customer Name</label>
+                    <p id="sellingPrice" class="list-group-item">@Model.Order.CustomerName</p>
+                    <br />
+                }
+                if (@Model.Order.CustomerPhone != null)
+                {
+                    <label for="sellingPrice">Customer Phone</label>
+                    <p id="sellingPrice" class="list-group-item">@Model.Order.CustomerPhone</p>
+                    <br />
+                }
+                <label for="sellingPrice">Given Discount </label>
+                <p id="sellingPrice" class="list-group-item">@Model.Order.Discount</p>
+                <br />
+                <label for="sellingPrice">Total Price </label>
+                <p id="sellingPrice" class="list-group-item">@Model.Order.TotalPrice</p>
+                <br />
+                <label for="sellingPrice"> Due Amount </label>
+                <p id="sellingPrice" class="list-group-item">@Model.Order.DueAmount</p>
+                <br />
+
+            }
+            else
+            {
+                <p id="details" class="list-group-item">Not Sold</p>
+                if (@Model.Unit.ReturnIdList != null)
+                {
+
+                    foreach (var returnUnit in @Model.Unit.ReturnIdList)
+                    {
+                        <br/>
+                        <lable><u>Returned Customer </u> </lable>
+                        <br/><br/>
+                        <label for="sellingPrice">Customer Name</label>
+                        <p id="sellingPrice" class="list-group-item">@returnUnit.CustomerName</p>
+                        <br />
+                        <label for="sellingPrice">Customer Phone</label>
+                        <p id="sellingPrice" class="list-group-item">@returnUnit.CustomerPhone</p>
+                        <br />
+                        <label for="sellingPrice">Return Date</label>
+                        <p id="sellingPrice" class="list-group-item">@returnUnit.ReturnTime.Date.Day / @returnUnit.ReturnTime.Date.Month / @returnUnit.ReturnTime.Date.Year   </p>
+                        <br />
+                    }
+                }
+            }
+            <br />
+
+
+
+        </div>
+
+    </div>
+</div>

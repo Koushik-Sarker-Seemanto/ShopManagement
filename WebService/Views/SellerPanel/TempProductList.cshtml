@@ -1,0 +1,48 @@
+@model System.Collections.Generic.List<Models.Entities.IndividualProduct>
+
+@{
+    ViewData["Title"] = "All Products";
+    Layout = "_LayoutSeller";
+}
+<div class="text-center">
+    <h1 class="display-1">All indevidual product list!</h1>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header" style="cursor: pointer">
+        <i class="fas fa-table mr-1"></i>
+        Individual Product Table
+        <i class="fas fa-caret-down float-right"></i>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0">
+                <thead>
+                <tr class="text-center">
+                    <th>Id</th>
+                    <th>Buying Price</th>
+                    <th>CreatedAt</th>
+                    <th>Sold</th>
+                    <th>SellDateTime</th>
+                </tr>
+                </thead>
+                <tbody>
+                @{
+                    foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Id</td>
+                            <td>@item.BuyingPrice</td>
+                            <td>@item.CreatedAt</td>
+                            <td>@item.Sold</td>
+                            <td>@item.SellDateTime</td>
+                        </tr>
+                        
+                    }
+                }
+                </tbody>
+                
+            </table>
+        </div>
+    </div>
+</div>

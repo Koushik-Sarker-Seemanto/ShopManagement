@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -10,6 +11,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Repositories;
+using Services;
+using Services.Contracts;
 
 namespace WebService
 {
@@ -25,6 +28,28 @@ namespace WebService
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            
+            //authentication configure
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/AdminAuth/Login";
+                    options.AccessDeniedPath = "/AdminAuth/UnauthorizedPage/";
+                    options.Cookie.Name = "UserLoginCookie";
+                });
+            services.AddRazorPages()
+                .AddRazorRuntimeCompilation();
+
+            services.AddAuthorization(option =>
+            {
+                option.AddPolicy("Admin", policy =>
+                    policy.RequireClaim("Role", "Admin"));
+                option.AddPolicy("Manager", policy =>
+                    policy.RequireClaim("Role", "Manager"));
+                option.AddPolicy("Seller", policy =>
+                    policy.RequireClaim("Role", "Seller"));
+            });
+            
             services.Configure<DatabaseSettings>(
                 Configuration.GetSection(nameof(DatabaseSettings)));
             
@@ -32,6 +57,10 @@ namespace WebService
                 sp.GetRequiredService<IOptions<DatabaseSettings>>().Value);
 
             services.AddSingleton<IMongoRepository, MongoRepository>();
+            services.AddSingleton<IUserServices, UserServices>();
+            services.AddSingleton<ISellerPanelService, SellerPanelService>();
+            services.AddSingleton<IAdminPanelService, AdminPanelService>();
+            services.AddSingleton<IManagerPanelService, ManagerPanelService>();
             
             services.AddControllersWithViews();
         }
@@ -54,6 +83,8 @@ namespace WebService
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

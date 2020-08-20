@@ -1,0 +1,246 @@
+﻿@model Models.Entities.Product
+@{
+    ViewData["Title"] = "Product Details";
+    Layout = "_LayoutManager";
+}
+
+
+    <div id="bar">
+        <h2 class="d-flex justify-content-center" id="barcodeImgTitle"></h2><br /><br />
+        <div class="row" style="margin-left: 8%" id="barcodeDiv" style="background: white">
+
+        </div>
+    </div>
+
+@if (Model != null)
+{
+    <div class="col-lg-8 col-md-9 col-sm-12 pt-3 m-auto" id="nonbar">
+        <div class="card text-black mb-4">
+            <div class="card-header text-center" style="background: #eeeeee"><h1>Product Details</h1></div>
+            <div class="card-body p-5 bg-light">
+                <label for="name">Name</label>
+                @if (@Model.Name != null)
+                {
+                    <p id="name" class="list-group-item">@Model.Name</p>
+                }
+                else
+                {
+                    <p id="name" class="list-group-item">N/A</p>
+                }
+                <br />
+                <label for="buyingPrice2">Stock Warning Amount</label>
+                <p id="buyingPrice2" class="list-group-item">@Model.StockWarning</p>
+                <br />
+                <label for="sellingPrice">Selling Price</label>
+                <p id="sellingPrice" class="list-group-item">@Model.SellingPrice</p>
+                <br />
+                <br />
+                <label for="buyingPricePrice">Buying Price</label>
+                <p id="buyingPrice" class="list-group-item">@Model.BuyingPrice</p>
+                <br />
+                <label for="stock">Stock</label>
+                <p id="stock" class="list-group-item">@Model.Stock</p>
+                <br />
+
+                <label for="details">Description</label>
+                @if (@Model.Details != null)
+                {
+                    <p id="details" class="list-group-item">@Model.Details</p>
+                }
+                else
+                {
+                    <p id="details" class="list-group-item">N/A</p>
+                }
+                <br />
+
+                <form id="generateProductForm" method="get" style="margin-left: 5%; margin-right: 5%;margin-top:5% " asp-controller="ManagerPanel" asp-action="GenerateBarcode">
+                    <label><b>Stock To Add</b></label>
+
+                    <input class="form-control py-4" id="stockId" name="stock" placeholder="Enter Stock Amount to Add">
+                    <br />
+                    <input class="form-control py-4" id="buyingPrice" name="buyingPrice" placeholder="Enter Buying Price">
+                    <input class="form-control py-4" id="productId" name="productId" style="visibility: hidden" value="@Model.Id">
+                    <input id="generateProductBtn" type="submit" class="btn btn-success" value="Generate Product" />
+                </form>
+
+
+            </div>
+            
+        </div>
+    </div>
+}
+else
+{
+    <div class="col-md-6 pt-3 m-auto">
+        <div class="card text-black mb-4">
+            <div class="card-header text-center"><h1>Product Details</h1></div>
+            <div class="card-body text-center">
+                <h1> Not Found!</h1>
+            </div>
+            <div class="card-footer d-flex align-items-center justify-content-between">
+                <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+            </div>
+        </div>
+    </div>
+}
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js" integrity="sha512-s/XK4vYVXTGeUSv4bRPOuxSDmDlTedEpMEcAQk0t/FMd9V6ft8iXdwSBxV0eD60c6w/tjotSlKu9J2AAW1ckTA==" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+<script>
+
+$(document).ready(function() {
+    
+    $("#generateProductForm").submit(function(e) {
+        e.preventDefault();
+        let stockVal = $("#stockId").val();
+        let buyingPriceVal = $("#buyingPrice").val();
+        let productIdVal = $("#productId").val();
+        console.log(stockVal+" : "+buyingPriceVal+" : "+productIdVal);
+        if (stockVal === "" || stockVal === undefined || buyingPriceVal === "" || 
+            buyingPriceVal === undefined || productIdVal === "" || productIdVal === undefined){
+            alert("Invalid Input");
+            return false;
+        }
+        if (stockVal > 85) {
+            alert("Please Enter Between 0-85");
+            return false;
+        }
+        e.preventDefault(); // stops the default action
+        //$("#loader").show(); // shows the loading screen
+        swal({
+            title: "Loading...",
+            text: "Please wait",
+            showCancelButton: true,
+            allowOutsideClick: false,
+        });
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GenerateBarcode", "ManagerPanel")',
+            contentType: "application/json; charset=utf-8",
+            data: {
+                stock: stockVal,
+                buyingPrice: buyingPriceVal,
+                productId: productIdVal,
+            },
+            success: function(response) {
+                if (response.status === "Success"){
+                    swal.close();
+                    if (response.res === "NonBarCode") {
+                        
+                        alert("NonBarCode product added!");
+                        return false;
+                    }
+                    console.log("List Found");
+                    let list = JSON.parse(response.res);
+                    let productName = response.productName;
+                    
+                    generateBarcode(list, productName);
+                    //downloadBarcodePdf();
+                }
+                else {
+                    alert("Response status Fail");
+                }
+            },
+            error: function() {
+                console.log("Error!!! List Not Found")
+            },
+        });
+    });
+});
+
+function generateBarcode(list,productName) {
+    //let ids = ["2c2e2100-f590-46c7-860d-bde538fb7eff", "ac32365b-7ca8-47c3-903a-f1f1dff5fe13", "ae75c229-3ea0-4027-ad1a-73b6091dc71b"];
+    //let testId = "ac32365b-7ca8-47c3-903a-f1f1dff5fe13";
+    $("#barcodeImgTitle").text(productName);
+    for (i = 0; i < list.length; i++){
+        let id = 'barcodeSvg' + i;
+        let img = `<div style="margin-right: 8%;margin-bottom: 4% "><svg id="${id}" ></svg></div>`;
+//        $("#" + id).attr("style", "margin-right: 30% ; margin-bottom:30%");
+        $("#barcodeDiv").append(img);
+        JsBarcode(`#${id}`, list[i], {
+            width:1.5,
+            height: 60,
+            fontSize : 15
+        });
+    }
+    $("#nonbar").toggle();
+    window.print();
+}
+
+/*function downloadBarcodePdf() {
+    var doc = new jsPDF();
+    
+    doc.addHTML(document.getElementById('barcodeDiv'), function() {
+        //doc.save('invoice.pdf');
+        doc.autoPrint();
+        //This is a key for printing
+        doc.output('dataurlnewwindow');
+    });
+}*/
+</script>
+
+
+
+@*
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-7">
+            <div class="card shadow-lg border-0 rounded-lg mt-5">
+                <div class="card-header"><h3 class="text-center font-weight-light my-4"> Product Details</h3></div>
+                <div class="card-body" style="text-align: center">
+                    @if (Model != null)
+                    {
+                        <label><b>Product Title</b></label>
+                        <br>
+                        @if (Model.Name != null)
+                        {
+                            <span style="margin-top: -1%">@Model.Name </span>
+                        }
+                        else
+                        {
+                            <span style="margin-top: -1%">N/A </span>
+                        }
+                        <br/>
+                        <label><b>Buying Price</b></label>
+                        <br>
+                        <span style="margin-top: -1%">@Model.BuyingPrice </span>
+                        <br/>
+                        <label><b>Selling Price</b></label>
+                        <br>
+                        <span>@Model.SellingPrice</span>
+                        <br/>
+                        <label><b>Current Stock</b></label>
+                        <br>
+                        <span>@Model.Stock</span>
+                        <br/>
+                        <label><b>Description</b></label>
+                        <br>
+                        @if (Model.Details != null)
+                        {
+                            <span style="margin-top: -1%">@Model.Details </span>
+                        }
+                        else
+                        {
+                            <span style="margin-top: -1%">N/A </span>
+                        }
+                        <br/>
+                        
+                        <form style="margin-left: 5%; margin-right: 5%;margin-top:5% " action="GenerateBarcode">
+                            <label><b>Stock To Add</b></label>
+
+                            <input class="form-control py-4" id="stock" name="stock" placeholder="Enter Stock Amount to Add">
+                            <input class="form-control py-4" id="productId" name="productId" style="visibility: hidden" value="@Model.Id">
+                            <input type="submit" class="btn btn-success" value="Generate Barcode"/>
+                        </form>
+                    }
+                    else
+                    {
+                        <div class="text-center h1">No Product Found!!!</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+*@

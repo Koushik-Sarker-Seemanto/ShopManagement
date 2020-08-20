@@ -1,0 +1,9 @@
+@{
+    ViewData["Title"] = "Unauthorized";
+}
+
+<div class="text-center">
+    <h1 class="display-2">Ops! You are unauthorized.</h1>
+    <h1 class="display-4">Login First.</h1>
+    @Html.ActionLink("Link", "Login", "AdminAuth", null,new { @class = "btn btn-primary" })
+</div>
