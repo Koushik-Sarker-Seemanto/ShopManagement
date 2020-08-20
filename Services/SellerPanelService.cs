@@ -306,8 +306,9 @@ namespace Services
 
         public async Task<ProductDetails> ProductDetailWithReturn(ProductIdInput product)
         {
-           
-                var indi = await GetIndividualProductById(product.ProductId);
+            var indi = await GetIndividualProductById(product.ProductId);
+            if (indi != null)
+            {
                 var res = new ProductDetails();
                 res.Unit = buildIndividualProductView(indi);
                 res.Product = await GetProductById(indi.CategoryId);
@@ -331,9 +332,9 @@ namespace Services
                 }
 
                 return res;
+            }
 
-
-            
+            return null;
         }
 
         private IndividualProductView buildIndividualProductView(IndividualProduct product)
