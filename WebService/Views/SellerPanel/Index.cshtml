@@ -4,14 +4,6 @@
     ViewBag.Index = true;
 }
 
-<div class="text-center">
-    <h1 class="display-1">Welcome to Seller Index Page!</h1>
-
-    @*<input placeholder="Product Id" id="inbox" />
-    <input placeholder="Name" id="name" />
-    <input placeholder="Phone Number" id="phone" />*@
-</div>
-
 <div id="content" class="card mb-4">
     <div class="card-header" id="manager-table-header" style="cursor: pointer">
         <i class="fas fa-table mr-1"></i>
@@ -80,14 +72,15 @@
                         query: request.term,
                     },
                     success: function(response) {
+                        console.log("Dict"+JSON.parse(response.res));
                         if (response.status === "Not Found"){
                             console.log("List Not Found");
                         }
                         else {
                             cb($.map( JSON.parse(response.res), function( item ) {
                                 return {
-                                  label: item,
-                                  value: item
+                                  label: item.Name+"("+item.Stock+")",
+                                  value: item.Name
                                 }
                             }));
                         }
@@ -378,5 +371,6 @@
             //This is a key for printing
             doc.output('dataurlnewwindow');
         });
+        location.reload(true);
     }
 </script>

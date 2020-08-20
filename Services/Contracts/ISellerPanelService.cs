@@ -12,7 +12,7 @@ namespace Services.Contracts
     {
         public Task<ProductSellViewModel> GetProductFromBar(string id, bool returnProduct);
         public Task<ProductSellViewModel> GetProductNonBar(string name, string quantity);
-        public Task<List<string>> GetProductByName(string query);
+        public Task<List<ProductSuggestion>> GetProductByName(string query);
         public Task<Order> SellProduct(OrderViewModel model);
         public Task<ReturnProduct> ReturnProduct(ReturnViewModel model);
         public List<IndividualProduct> GetAllProducts();

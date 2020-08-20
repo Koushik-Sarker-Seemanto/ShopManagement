@@ -94,12 +94,24 @@ namespace Services
             }
         }
 
-        public async Task<List<string>> GetProductByName(string query)
+        public async Task<List<ProductSuggestion>> GetProductByName(string query)
         {
             try
             {
+                List<ProductSuggestion> suggestions = new List<ProductSuggestion>();
                 var result = _repository.GetItems<Product>(e => e.Name.ToUpper().Contains(query.ToUpper()) && e.ProductType == "NonBarcode");
-                return result?.Select(e => e.Name).ToList();
+                foreach (var item in result)
+                {
+                    var temp = new ProductSuggestion { Name = item.Name, Stock = item.Stock};
+                    suggestions.Add(temp);
+                }
+
+                if (suggestions.Count > 0)
+                {
+                    return suggestions;
+                }
+
+                return null;
             }
             catch (Exception ex)
             {
