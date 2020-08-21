@@ -31,6 +31,7 @@ namespace WebService.Controllers
         public async Task<IActionResult> Index()
         {
             var indexViewModel = await _adminPanelService.GetIndexData();
+            
             return View(indexViewModel);
         }
 
