@@ -4,38 +4,53 @@
     Layout = "_LayoutAdmin";
 }
 
-@* <h1 class="mt-4">Dashboard</h1> *@
-@* <ol class="breadcrumb mb-4"> *@
-@*     <li class="breadcrumb-item active">Dashboard</li> *@
-@* </ol> *@
-@* <div class="text-center" style="background: #eeeeee"> *@
-@* 	<h1 class="display-2">TODO: Dashboard Charts</h1> *@
-@* 	 *@
-@* </div> *@
 
-@*
+<h1 class="mt-4">Dashboard</h1>
+<ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item active">Dashboard</li>
+</ol>
 <div class="row">
 	<div class="col-xl-6">
 		<div class="card mb-4">
 			<div class="card-header">
 				<i class="fas fa-chart-area mr-1"></i>
-				Area Chart Example
+				Profit Bar-Graph (Last 10 Days)
 			</div>
-			<div class="card-body"><canvas id="myAreaChart" width="100%" height="40"></canvas></div>
+			<div class="card-body"><canvas id="profitPerDayBar" width="100%" height="50"></canvas></div>
 		</div>
 	</div>
 	<div class="col-xl-6">
 		<div class="card mb-4">
 			<div class="card-header">
 				<i class="fas fa-chart-bar mr-1"></i>
-				Bar Chart Example
+				Sell Bar-Graph (Last 10 Days)
 			</div>
-			<div class="card-body"><canvas id="barChartDiv" width="100%" height="40"></canvas></div>
+			<div class="card-body"><canvas id="sellsPerDayBar" width="100%" height="50"></canvas></div>
 		</div>
 	</div>
 </div>
-*@
 
+
+<div class="row">
+	<div class="col-xl-6">
+		<div class="card mb-4">
+			<div class="card-header">
+				<i class="fas fa-chart-area mr-1"></i>
+				Top sold product (Last 10 Days)
+			</div>
+			<div class="card-body"><canvas id="topSoldProductBar" width="100%" height="50"></canvas></div>
+		</div>
+	</div>
+	<div class="col-xl-6">
+		<div class="card mb-4">
+			<div class="card-header">
+				<i class="fas fa-chart-bar mr-1"></i>
+				Top profitable product (Last 10 Days)
+			</div>
+			<div class="card-body"><canvas id="topProfitableProductBar" width="100%" height="50"></canvas></div>
+		</div>
+	</div>
+</div>
 
 @if (Model != null)
 {
@@ -44,30 +59,215 @@
     await Html.RenderPartialAsync("_SellerTable", Model);
 }
 
-<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 <script>
-/*
-$(document).ready(function() {
-    var barChart = new CanvasJS.Chart("barChartDiv", {
-		title:{
-			text: "My First Chart in CanvasJS"              
-		},
-		data: [              
-		{
-			// Change type to "doughnut", "line", "splineArea", etc.
-			type: "column",
-			dataPoints: [
-				{ label: "apple",  y: 10  },
-				{ label: "orange", y: 15  },
-				{ label: "banana", y: 25  },
-				{ label: "mango",  y: 30  },
-				{ label: "grape",  y: 28  }
-			]
-		}
-		]
-	});
-	barChart.render();
-});*/
+
+var dates = @Html.Raw(Json.Serialize(@Model?.DateWiseIncomes?.Select(e => e.Date.ToString("dd/MM/yyyy"))));
+var sellsPerDay = @Html.Raw(Json.Serialize(@Model?.DateWiseIncomes?.Select(e => e.DayToDayCalculation.TotalSell)));
+var profitPerDay = @Html.Raw(Json.Serialize(@Model?.DateWiseIncomes?.Select(e => e.DayToDayCalculation.TotalProfit)));
+
+
+var productNameProfit = @Html.Raw(Json.Serialize(@Model?.TopProfitableProduct?.Select(e => e.ProductName)));
+var topProfits = @Html.Raw(Json.Serialize(@Model?.TopProfitableProduct?.Select(e => e.Profit)));
+
+var productNames = @Html.Raw(Json.Serialize(@Model?.TopSoldProduct?.Select(e => e.ProductName)));
+var repeats = @Html.Raw(Json.Serialize(@Model?.TopSoldProduct?.Select(e => e.Repetition)));
+
+$(window).on("load", function() {
+    
+	//Sells per day bar graph.
+	var ctx = document.getElementById('sellsPerDayBar').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'Sell amount',
+                data:  sellsPerDay,
+                backgroundColor: [
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(75, 192, 192, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(75, 192, 192, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+
+    //Profit per day bar graph.
+    var ctx = document.getElementById('profitPerDayBar').getContext('2d');
+    var myChart2 = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'Profit',
+                data:  profitPerDay,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+    
+    
+    //Top sold products.
+    var ctx = document.getElementById('topSoldProductBar').getContext('2d');
+    var myChart3 = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: productNames,
+            datasets: [{
+                label: 'Sell',
+                data:  repeats,
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)',
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+    
+    
+    
+    //Top sold products.
+        var ctx = document.getElementById('topProfitableProductBar').getContext('2d');
+        var myChart4 = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: productNameProfit,
+                datasets: [{
+                    label: 'Profit',
+                    data:  topProfits,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+    
+    
+    
+});
 
 </script>
