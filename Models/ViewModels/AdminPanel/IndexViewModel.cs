@@ -10,5 +10,6 @@ namespace Models.ViewModels.AdminPanel
         public List<User> Sellers { get; set; }
         public List<DateWiseIncome> DateWiseIncomes { get; set; }
         public List<ProductSellRepeat> TopSoldProduct { get; set; }
+        public List<ProductSellRepeat> TopProfitableProduct { get; set; }
     }
 }

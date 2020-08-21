@@ -30,13 +30,16 @@ namespace Services
                 var managers = await GetAllManager();
                 var sellers = await GetAllSeller();
                 var dateWiseIncome = await GetDateWiseIncome(DateTime.Now);
-                var topSoldProduct = await GetTopSoldProduct(DateTime.Now);
+                var productSellRepeats = await GetTopSoldProduct(DateTime.Now);
+                var topSoldProduct = productSellRepeats.OrderBy(e => e.Repetition).Take(5).ToList();
+                var topProfitableProduct = productSellRepeats.OrderBy(e => e.Profit).Take(5).ToList();
                 IndexViewModel indexViewModel = new IndexViewModel
                 {
                     Managers = managers,
                     Sellers = sellers,
                     DateWiseIncomes = dateWiseIncome,
                     TopSoldProduct = topSoldProduct,
+                    TopProfitableProduct = topProfitableProduct,
                 };
                 return indexViewModel;
             }
@@ -57,18 +60,26 @@ namespace Services
             var categories = products.Select(e => e.CategoryId).Distinct();
             foreach (var item in categories)
             {
-                var repeat = products.Count(e => e.CategoryId == item);
+                var sameTypeProduct = products.Where(e => e.CategoryId == item);
+                int repeat = sameTypeProduct.Count();
+                double profit = 0;
+
+                foreach (var unitProfit in sameTypeProduct)
+                {
+                    profit += (unitProfit.SellingPrice - unitProfit.BuyingPrice);
+                }
                 var product = await this._repository.GetItemAsync<Product>(e => e.Id == item);
                 ProductSellRepeat sell = new ProductSellRepeat
                 {
                     ProductId = product?.Id,
                     ProductName = product?.Name,
                     Repetition = repeat,
+                    Profit = profit,
                 };
                 productSellRepeats.Add(sell);
             }
 
-            productSellRepeats = productSellRepeats.OrderBy(e => e.Repetition).Take(10).ToList();
+            //productSellRepeats = productSellRepeats.OrderBy(e => e.Repetition).Take(5).ToList();
             
             return productSellRepeats;
         }
