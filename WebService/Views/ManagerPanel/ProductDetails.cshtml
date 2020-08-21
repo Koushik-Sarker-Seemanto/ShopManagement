@@ -108,11 +108,11 @@ $(document).ready(function() {
         }
         e.preventDefault(); // stops the default action
         //$("#loader").show(); // shows the loading screen
-        swal({
-            title: "Loading...",
-            text: "Please wait",
-            showCancelButton: true,
-            allowOutsideClick: false,
+        Swal.fire({
+            title: 'Loading',
+            text: 'Please Wait...',
+            showCancelButton: false,
+            showConfirmButton: false
         });
         $.ajax({
             type: "GET",
@@ -124,12 +124,13 @@ $(document).ready(function() {
                 productId: productIdVal,
             },
             success: function(response) {
-                if (response.status === "Success"){
-                    swal.close();
+                swal.close();
+                if (response.status === "Success") {
+                    
                     if (response.res === "NonBarCode") {
                         
                         alert("NonBarCode product added!");
-                        location.reload(true);
+                        $(location).attr('href', 'http://168.119.61.248/SellerPanel');     
                         return false;
                     }
                     console.log("List Found");
