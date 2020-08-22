@@ -9,6 +9,7 @@ namespace Models.ViewModels.SellerPanel
     {
         public string Name { get; set; }
         public string Phone { get; set; }
+        public string Seller { get; set; }
         public List<string> Order { get; set; }
         public List<NonBar> OrderNonBar { get; set; }
         public double TotalPrice { get; set; }

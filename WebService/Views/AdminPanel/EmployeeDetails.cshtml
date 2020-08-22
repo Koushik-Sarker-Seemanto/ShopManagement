@@ -73,8 +73,7 @@
                     }
                 </div>
                 <div class="card-footer d-flex align-items-center justify-content-between">
-                    <a class="customBtn-admin-primary float-left text-white">Update</a>
-                    <a class="customBtn-admin-primary float-right text-white">Delete</a>
+                    <a class="customBtn-admin-primary float-right text-white" href="@Url.Action("DeleteUser", "AdminPanel",new {userid = @Model.Employee.Id})">Delete</a>
                 </div>
             </div>
         </div>

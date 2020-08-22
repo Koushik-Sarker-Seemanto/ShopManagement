@@ -1,0 +1,109 @@
+﻿@model Models.ViewModels.AdminPanel.OrderViewModel
+@{
+    ViewData["Title"] = "OrderDetails";
+    Layout = "_LayoutAdmin";
+
+}
+
+<h1>Order Detailes</h1>
+
+<div id="content" class="card mb-4">
+    <div class="card-header" id="manager-table-header" style="cursor: pointer">
+        <i class="fas fa-table mr-1"></i>
+        Product Invoice
+        <i class="fas fa-caret-down float-right"></i>
+    </div>
+    <div class="card-body">
+        <div class="form-group">
+            <label class="mb-1" for="name">Order Date</label>
+            <input class="form-control" placeholder="Name" id="name" value="@String.Format("{0:dddd, MMMM d, yyyy}", @Model.SoldAt)" readonly />
+        </div>
+        <div class="form-group">
+            <label class="mb-1" for="name">Seller Name</label>
+            <input class="form-control" placeholder="Name" id="name" value="@Model.SellerName" readonly />
+        </div>
+        <div class="form-row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="mb-1" for="name">Buyer Name</label>
+                    <input class="form-control" placeholder="Name" id="name" value="@Model.CustomerName" readonly />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="mb-1" for="phone">Buyer Phone</label>
+                    <input class="form-control" placeholder="Phone Number" id="phone" value="@Model.CustomerPhone" readonly />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="table-responsive m-2">
+        <table class="table table-bordered" id="productToBeSold" width="100%" cellspacing="0">
+            <colgroup>
+                <col span="1" style="width: 50%;">
+                <col span="1" style="width: 10%;">
+                <col span="1" style="width: 15%;">
+                <col span="1" style="width: 20%;">
+                <col span="1" style="width: 5%">
+
+
+                @* <col span="1" style="width: 10%;"> *@
+            </colgroup>
+            <thead>
+                <tr class="text-center">
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Unit Price</th>
+                    <th>Total Price</th>
+
+                </tr>
+            </thead>
+            @foreach (var product in Model.Products)
+            {
+                <tr class="each-item" type="bar">
+                    <td class="text-center productName">@product.ProductName</td>
+                    <td class="text-center amountSelect">1</td>
+                    <td class="text-center productPrice">@product.ProductPrice</td>
+                    <td class="text-center">@product.ProductPrice</td>
+                </tr>
+            }
+            @foreach (var product in Model.ProductNonBar)
+            {
+                <tr class="each-item" type="non-bar">
+                    <td class="text-center productName">@product.ItemName</td>
+                    <td class="text-center amountSelect">@product.Amount</td>
+                    <td class="text-center">N/A</td>
+                    <td class="text-center">N/A</td>
+                </tr>
+            }
+
+        </table>
+    </div>
+
+
+
+    <div class="table-responsive m-2">
+        <table class="table table-bordered" id="sellAmount" width="100%" cellspacing="0">
+            <colgroup>
+                <col span="1" style="width: 60%;">
+                <col span="1" style="width: 35%;">
+
+            </colgroup>
+            <thead>
+                <tr>
+                    <td class="text-right">Discount</td>
+                    <td><input class="form-control" value="@Model.Discount" placeholder="0" id="discount" readonly /></td>
+                </tr>
+                <tr>
+                    <td class="text-right">Total Price</td>
+                    <td id="total">@Model.TotalPrice </td>
+                </tr>
+
+                <tr>
+                    <td class="text-right">Due</td>
+                    <td id="due">@Model.DueAmount </td>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>

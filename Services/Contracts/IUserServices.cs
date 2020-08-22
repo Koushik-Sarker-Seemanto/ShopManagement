@@ -11,6 +11,7 @@ namespace Services.Contracts
     {
         Task<User> Authenticate(string username, string password);
         Task<User> RegisterUser(RegisterViewModel model);
+        Task<bool> DeleteUser(string userid);
         ClaimsIdentity GetSecurityClaims(User userInfo, string authenticationType = null);
     }
 }

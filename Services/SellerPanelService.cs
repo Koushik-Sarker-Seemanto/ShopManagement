@@ -184,6 +184,7 @@ namespace Services
                         Id = orderId,
                         CustomerName = model.Name,
                         CustomerPhone = model.Phone,
+                        SellerName = model.Seller,
                         Products = model.Order,
                         ProductNonBar = model.OrderNonBar,
                         Discount = model.Discount,

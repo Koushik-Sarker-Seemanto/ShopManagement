@@ -1,22 +1,24 @@
-﻿@{
-    ViewData["Title"] = "Due Orders";
+﻿
+@{
+    ViewData["Title"] = "OrderDatewise";
     Layout = "_LayoutAdmin";
 }
-<h1>@ViewData["Title"]</h1>
+
+<h1>OrderDatewise</h1>
 
 <div class="table-responsive">
     <table class="table table-bordered" id="orderTable" width="100%" cellspacing="0">
         <thead>
             
-            <tr class="text-center">
-                <th>Order Id</th>
-                <th>Date</th>
-                <th>Customer Name</th>
-                <th>Customer Phone</th>
-                <th>Due Amount</th>
-                <th>Seller Name</th>
-                <th>Action Link</th>
-            </tr>
+        <tr class="text-center">
+            <th>Order Id</th>
+            <th>Date</th>
+            <th>Customer Name</th>
+            <th>Customer Phone</th>
+            <th>Due Amount</th>
+            <th>Seller Name</th>
+            <th>Action Link</th>
+        </tr>
         </thead>
 
     </table>
@@ -28,7 +30,7 @@
         "filter": true, // this is for disable filter (search box)
         "orderMulti": false, // for disable multiple column at once
         "ajax": {
-            "url": "/AdminPanel/Dues",
+            "url": "/AdminPanel/orders",
             "type": "POST",
             "datatype": "json"
         },
@@ -44,19 +46,22 @@
         ],
         "columns": [
             { "data": "id", "name": "Order Id", "autoWidth": true },
-            { "data": "soldAt", "name": "Date", "autoWidth": true},
+            { "data": "soldAt", "name": "Date", "autoWidth": true },
             { "data": "customerName", "name": "Customer Name", "autoWidth": true },
             { "data": "customerPhone", "name": "Customer Phone", "autoWidth": true },
             { "data": "dueAmount", "name": "Due Amount", "autoWidth": true },
             { "data": "sellerName", "name": "Seller Name", "autoWidth": true },
 
             {
-                "render": function (data, type, full, meta) { return '<a class="btn btn-info" href="PayDue?id=' + full.id + '">Details</a>'; }
+                "render": function (data, type, full, meta) { return '<a class="btn btn-info" href="OrderDetails?id=' + full.id + '">Order Details</a>'; }
             },
         ]
 
     });
 
 </script>
+
+
+
 
 

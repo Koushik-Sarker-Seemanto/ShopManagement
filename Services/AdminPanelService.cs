@@ -162,11 +162,36 @@ namespace Services
             var items = await _repository.GetItemsAsync<Product>(d => d.Name.Contains(search));
             return items.ToList();
         }
-        public IQueryable<Order> GetAllDueOrders()
+        public async Task<List<Product>> GetAllProducts()
+        {
+            var items = await _repository.GetItemsAsync<Product>();
+            return items.ToList();
+        }
+        public IQueryable<OrderTable> GetAllDueOrders()
         {
             var items =  _repository.GetItems<Order>(d=>d.DueAmount > 0.00);
-       
-            return items;
+            var res = BuildOrderTableList(items);
+            return res;
+        }
+
+        public IQueryable<OrderTable> BuildOrderTableList(IQueryable<Order> ordes)
+        {
+            var list = ordes?.ToList();
+            var ListRes = new List<OrderTable>();
+            foreach (var order in list)
+            {
+                var unit = new OrderTable();
+                unit.Id = order.Id;
+                unit.SoldAt = @String.Format("{0:dddd, MMMM d, yyyy}", order.SoldAt);
+                unit.CustomerName = order.CustomerName;
+                unit.CustomerPhone = order.CustomerPhone;
+                unit.DueAmount = order.DueAmount;
+                unit.SellerName = order.SellerName;
+                ListRes.Add(unit);
+            }
+            var queryable = ListRes.AsQueryable();
+            return queryable;
+
         }
 
         public async Task<List<Order>> OrderInDateRange(FromToDate val)
@@ -332,6 +357,7 @@ namespace Services
             var order = await _repository.GetItemAsync<Order>(d => d.Id == id);
             var OrderView = new OrderViewModel();
             OrderView.Id = order.Id;
+            OrderView.SellerName = order.SellerName;
             OrderView.CustomerName = order.CustomerName;
             OrderView.CustomerPhone = order.CustomerPhone;
             OrderView.SoldAt = order.SoldAt;
@@ -395,6 +421,60 @@ namespace Services
             }
 
             return list;
+        }
+
+        public async Task<ProductView> GetProductViewById(Product product)
+        {
+            var ress = await _repository.GetItemsAsync<IndividualProduct>(d => d.CategoryId == product.Id && d.Sold == false);
+            var res = ress?.ToList();
+            var proView = new ProductView();
+            proView.Name = product.Name;
+            proView.Stock = product.Stock;
+            proView.StockValue = 0.00;
+            foreach (var indi in res)
+            {
+                proView.StockValue += indi.BuyingPrice;
+            }
+
+            proView.AverageUnitprice = proView.StockValue / proView.Stock;
+            return proView;
+        }
+        
+        public async Task<StockAmount> GetFullStockAmount()
+        {
+            var resProduct = await GetAllProducts();
+            var res = new StockAmount();
+            res.ProductList = new List<ProductView>();
+            res.TotalAmount = 0.00;
+            foreach (var product in resProduct)
+            {
+                if (product.ProductType == "NonBarcode")
+                {
+                    var resPro = new ProductView();
+                    resPro.Name = product.Name;
+                    resPro.Stock = product.Stock;
+                    resPro.AverageUnitprice = product.BuyingPrice;
+                    resPro.StockValue += product.Stock * product.BuyingPrice;
+                    res.ProductList.Add(resPro);
+                    res.TotalAmount += resPro.StockValue;
+                }
+                else
+                {
+                    var resProd = await GetProductViewById(product);
+                    res.ProductList.Add(resProd);
+                    res.TotalAmount += resProd.StockValue;
+                }
+            }
+
+            return res;
+
+        }
+        public IQueryable<OrderTable> GetAllOrders(FromToDate val)
+        {
+            var items = _repository.GetItems<Order>(d=>d.SoldAt <val.ToDateTime && d.SoldAt > val.FromDateTime);
+            var res = BuildOrderTableList(items);
+            _logger.LogInformation(res.Count()+" -------------  ");
+            return res;
         }
     }
 }

@@ -18,6 +18,7 @@ namespace Models.ViewModels.AdminPanel
         public List<NonBarViewModel> ProductNonBar { get; set; }
         public double TotalPrice { get; set; }
         public double Discount { get; set; }
+        public string SellerName { get; set; }
         public double DueAmount { get; set; }
         [BsonDateTimeOptions(Kind = DateTimeKind.Local)]
         [BsonRepresentation(BsonType.DateTime)]
