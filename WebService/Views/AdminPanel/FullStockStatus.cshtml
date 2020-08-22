@@ -1,0 +1,38 @@
+﻿@model Models.ViewModels.AdminPanel.StockAmount
+@{
+    ViewData["Title"] = "FullStockStatus";
+    Layout = "_LayoutAdmin";
+}
+<div style="text-align: center">
+    <h1>FullStockStatus</h1>
+    <h3>Total Product Stocked In the Shop <b>@ViewBag.Total</b> </h3>
+
+</div>
+<br/>
+
+<div class="table-responsive">
+    <table class="table table-bordered" id="stockSta" width="100%" cellspacing="0">
+        <thead>
+            
+        <tr class="text-center">
+            <th>Name</th>
+            <th>Stock</th>
+            <th>Average Unit Price</th>
+            <th>Total Stock Value (Taka)</th>
+
+        </tr>
+        </thead>
+        @foreach (var product in @Model.ProductList)
+        {
+    <tr>
+        <td class="text-center">@product.Name</td>
+        <td class="text-center">@product.Stock</td>
+        <td class="text-center">@product.AverageUnitprice</td>
+        <td class="text-center">@product.StockValue</td>
+    </tr>
+        }
+
+    </table>
+</div>
+
+

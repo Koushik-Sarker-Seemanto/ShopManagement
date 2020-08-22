@@ -82,6 +82,7 @@ namespace Services
                         Id = model.Id,
                         Name = model.Name,
                         StockWarning = model.StockWarning,
+                        Stock = model.StockWarning,
                         SellingPrice = model.SellingPrice,
                         BuyingPrice = model.BuyingPrice,
                         Details = model.Details,
@@ -131,6 +132,7 @@ namespace Services
                     res.SellingPrice = pro.SellingPrice;
                     res.StockWarning = pro.StockWarning;
                     res.Details = pro.Details;
+                    res.Stock = pro.Stock;
                     res.BuyingPrice = pro.BuyingPrice;
                     res.ProductType = pro.ProductType;
                     Debug.Print(res.Name + "aascccccccccccccccccccccc");

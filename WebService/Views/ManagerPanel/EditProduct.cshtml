@@ -17,11 +17,17 @@
                             <input asp-for="Id" class="form-control py-4" id="id" type="text">
                             <span asp-validation-for="Id" class="text-danger"></span>
                         </div>
+                        <div class="form-group" style="visibility: hidden">
+                            <label class="small mb-1" for="name">Name</label>
+                            <input asp-for="Stock" class="form-control py-4" id="stock" type="text">
+                            <span asp-validation-for="Stock" class="text-danger"></span>
+                        </div>
                         <div class="form-group">
                             <label class="small mb-1" for="name">Name</label>
                             <input asp-for="Name" class="form-control py-4" id="name" type="text" placeholder="Enter Name">
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
+
 
                         <div class="form-group">
                             <label class="small mb-1" for="sellingPrice">Selling Price</label>

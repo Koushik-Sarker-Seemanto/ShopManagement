@@ -99,6 +99,18 @@ namespace Services
 
         }
 
+        public async Task<bool> DeleteUser(string userid)
+        {
+            var user = await _repository.GetItemAsync<User>(d => d.Id == userid);
+            if (user != null)
+            {
+                await _repository.DeleteAsync<User>(d => d.Id == userid);
+                return true;
+            }
+
+            return false;
+        } 
+
         public ClaimsIdentity GetSecurityClaims(User userInfo, string authenticationType = null)
         {
             try

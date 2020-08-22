@@ -148,6 +148,7 @@ namespace WebService.Controllers
             try
             {
                 var orderData = Request.Form["order"];
+                var seller = Request.Form["seller"];
                 var order = JsonConvert.DeserializeObject<List<string>>(orderData);
                 var orderDataNonBar = Request.Form["orderNonBar"];
                 var orderNonBar = JsonConvert.DeserializeObject<List<NonBar>>(orderDataNonBar);
@@ -164,7 +165,7 @@ namespace WebService.Controllers
                 logger.LogInformation($"totalpriceeeeeeeeee: {totalPrice}");
                 logger.LogInformation($"dueeeeeeeeeeeeee: {due}");
                 OrderViewModel model = new OrderViewModel();
-                
+                model.Seller = seller;
                 model.Discount = Double.Parse(discount);
                 model.TotalPrice = Double.Parse(totalPrice);
                 model.DueAmount = Double.Parse(due);
@@ -184,6 +185,7 @@ namespace WebService.Controllers
                 model.Order = products;
                 model.OrderNonBar = productNonBar;
                 model.Name = name;
+                
                 model.Phone = phone;
                 var response = await _sellerPanelService.SellProduct(model);
                 if (response != null && !string.IsNullOrEmpty(response.Id))

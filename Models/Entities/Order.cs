@@ -12,6 +12,7 @@ namespace Models.Entities
         public string Id { get; set; }
         public string CustomerName { get; set; }
         public string CustomerPhone { get; set; }
+        public string SellerName { get; set; }
         [BsonRequired]
         public List<string> Products { get; set; }
 
