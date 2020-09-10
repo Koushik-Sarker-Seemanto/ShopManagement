@@ -456,21 +456,20 @@
     <center id="top" style="border-bottom: 1px solid #EEE;min-height: 100px;">
         <div class="info" style="display: block;margin-left: 0;">
             <h2 style="font-size: 1.5em;">M/S. Shymoli Enterprise</h2>
-            <p style="font-size: 1em;color: #666;line-height: 1.2em;">
-                Address : Narsingdi <br />
-                Phone   : 555-555-5555 <br />
-            </p>
+            <h2 style="font-size: 1em">Address : Narsingdi </h2> 
+            <h2 style="font-size: 1em">Phone   : 01611117874 </h2>
         </div><!--End Info-->
     </center><!--End InvoiceTop-->
 
     <div id="mid" style="border-bottom: 1px solid #EEE;min-height: 80px;">
         <div class="info" style="display: block;margin-left: 0;">
             <h2 style="font-size: 1.5em;">Customer Info</h2>
-            <p style="font-size: 1em;color: #666;line-height: 1.2em;">
-                Order ID : ${orderId}  <br />
-                Name    : ${buyerName}  <br />
-                Phone   : ${buyerPhone}  <br />
-            </p>
+            <h2 style="font-size: 1em;">Order ID : ${orderId} </h2>
+
+            <h2 style="font-size: 1em;">Name : ${buyerName} </h2>
+
+            <h2 style="font-size: 1em;">Phone : ${buyerPhone} </h2>
+            
         </div>
     </div>
     <!-- </div>End Invoice Mid -->
@@ -515,9 +514,9 @@
             let prodQuantity = productList[i].productQuantity;
             
             row = row + `<tr class="service" style="border-bottom: 1px solid #EEE;">
-                <td class="tableitem"><p class="itemtext" style="font-size: 1.2em;color: #666;line-height: 1.2em;">${prodName}</p></td>
-                <td class="tableitem"><p class="itemtext" style="font-size: 1.2em;color: #666;line-height: 1.2em;">${prodQuantity}</p></td>
-                <td class="tableitem"><p class="itemtext" style="font-size: 1.2em;color: #666;line-height: 1.2em;">${prodPrice * prodQuantity}</p></td>
+                <td class="tableitem"><h3  style="font-size: 1.2em;">${prodName}</p></td>
+                <td class="tableitem"><h3  style="font-size: 1.2em;">${prodQuantity}</p></td>
+                <td class="tableitem"><h3  style="font-size: 1.2em;">${prodPrice * prodQuantity}</p></td>
                 </tr>`;
         }
 
@@ -552,8 +551,8 @@
         </div><!--End Table-->
 
         <div id="legalcopy" style="margin-top: 5mm;">
-            <p class="legal" style="font-size: 1em;color: #666;line-height: 1.2em;">
-                <strong>Thank you for your business!</strong>             </p>
+            <h2 style="font-size: 1em">
+                <strong>Thank you for your business!</strong>             </h2>
         </div>
 
     </div><!--End InvoiceBot-->
