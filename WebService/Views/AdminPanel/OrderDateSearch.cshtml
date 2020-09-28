@@ -10,14 +10,14 @@
 @Html.ValidationSummary(true, "", new { @class = "text-danger alert alert-danger" })
 <form asp-action="OrderDateSearch" class="" autocomplete="off">
     <div class="form-group">
-        <label class="small mb-1" for="name">Product Id</label>
-        <input asp-for="FromDateTime" class="form-control py-4" id="name" type="date" placeholder="Enter Product Id">
+        <label class="small mb-1" for="name">From Date</label>
+        <input asp-for="FromDateTime" class="form-control py-4" id="name" type="date" placeholder="Enter Date">
         <span asp-validation-for="FromDateTime" class="text-danger"></span>
     </div>
 
     <div class="form-group">
-        <label class="small mb-1" for="name">Product Id</label>
-        <input asp-for="ToDateTime" class="form-control py-4" id="name" type="date" placeholder="Enter Product Id">
+        <label class="small mb-1" for="name">To Date</label>
+        <input asp-for="ToDateTime" class="form-control py-4" id="name" type="date" placeholder="Enter Date">
         <span asp-validation-for="ToDateTime" class="text-danger"></span>
     </div>
     <div class="form-group mt-4 mb-0"><button type="submit" class="customBtn-admin-primary text-white btn-block border-0">See Business Status</button></div>

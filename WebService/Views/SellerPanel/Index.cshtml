@@ -525,6 +525,13 @@
         let due = getDue();
         let payment = $('#payment').val();
 
+        var fullDate = new Date();
+        //convert month to 2 digits
+        var twoDigitMonth = ((fullDate.getMonth().length+1) === 1)? (fullDate.getMonth()+1) : '0' + (fullDate.getMonth()+1);
+ 
+        var currentDate = fullDate.getDate() + "/" + twoDigitMonth + "/" + fullDate.getFullYear();
+        console.log(currentDate);
+
         let domEnd = `<tr class="tabletitle">
                     <td></td>
                     <td class="Rate" style="width: 30mm;"><h2 style="font-size: 1.5em;">Discount</h2></td>
@@ -552,7 +559,7 @@
 
         <div id="legalcopy" style="margin-top: 5mm;">
             <h2 style="font-size: 1em">
-                <strong>Thank you for your business!</strong>             </h2>
+                <strong>Shopping date ${currentDate}</strong>             </h2>
         </div>
 
     </div><!--End InvoiceBot-->
