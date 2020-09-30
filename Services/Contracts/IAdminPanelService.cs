@@ -20,5 +20,6 @@ namespace Services.Contracts
         Task<bool> PayDue(string orderId, double dueAmount);
         Task<List<DayToDayCost>> CostStatus(FromToDate date);
         Task<StockAmount> GetFullStockAmount();
+        Task<List<OrderViewModel>> GetAllOrderViewModels(FromToDate dateRange);
     }
 }
