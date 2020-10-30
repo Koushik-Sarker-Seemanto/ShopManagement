@@ -488,16 +488,26 @@ namespace WebService.Controllers
                 // {
                 //     productData = productData.OrderBy(sortColumn + " " + sortColumnDirection);
                 // }
+                logger.LogInformation("--------------------------------"+searchValue);
                 // Search
+                List<OrderTable> orderTables = new List<OrderTable>();
                 if (!string.IsNullOrEmpty(searchValue))
                 {
-                    productData = productData.Where(m => m.CustomerName.ToUpper().Contains(searchValue.ToUpper()) || m.Id.ToUpper().Contains(searchValue.ToUpper()) || m.SellerName.ToUpper().Contains(searchValue.ToUpper()) || m.CustomerPhone.Contains(searchValue.ToUpper()));
+                    
+                    foreach (var order in productData)
+                    {
+                        orderTables.Add(order);
+                    }
+                    logger.LogInformation("Entered");
                 }
-
+                else
+                {
+                    orderTables = productData.ToList();
+                }
                 //total number of rows count   
-                recordsTotal = productData.Count();
+                recordsTotal = orderTables.Count();
                 //Paging   
-                var data = productData.Skip(skip).Take(pageSize).ToList();
+                var data = orderTables;
                 logger.LogInformation($"Data: {JsonConvert.SerializeObject(data)}");
                 //Returning Json Data  
                 return Json(new { draw = draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = data });
