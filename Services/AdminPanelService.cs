@@ -476,5 +476,17 @@ namespace Services
             _logger.LogInformation(res.Count()+" -------------  ");
             return res;
         }
+	public async Task<List<OrderViewModel>> GetAllOrderViewModels(FromToDate dateRange)
+        {
+            var res = await OrderInDateRange(dateRange);
+            List<OrderViewModel> orders = new List<OrderViewModel>();
+            foreach (var ordre in res)
+            {
+                var order = await GetOrderViewModel(ordre.Id);
+                orders.Add(order);
+            }
+
+            return orders;
+        }
     }
 }

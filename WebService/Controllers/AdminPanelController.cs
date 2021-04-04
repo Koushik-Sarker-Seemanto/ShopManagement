@@ -145,6 +145,42 @@ namespace WebService.Controllers
                 return BadRequest("Exception occured");
             }
         }
+	  public async Task<IActionResult> ExcelSearch()
+        {
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> ExcelSearch(FromToDate dateRange)
+        {
+            if (ModelState.IsValid == false)
+            {
+                return View(dateRange);
+            }
+            logger.LogInformation(dateRange.ToDateTime.ToString() + " at controller");
+            return RedirectToAction("Excel", new { valf = dateRange.FromDateTime.ToString(), valt = dateRange.ToDateTime.ToString() });
+
+        }
+
+        public async Task<IActionResult> Excel(string valf, string valt)
+        {
+            FromToDate val = new FromToDate();
+            val.FromDateTime = DateTime.Parse(valf);
+            val.ToDateTime = DateTime.Parse(valt);
+            val.ToDateTime.AddHours(23);
+
+            var res = await _adminPanelService.GetAllOrderViewModels(val);
+            int _max = -1;
+            foreach (var p in res)
+            {
+                _max = Math.Max(p.Products.Count, _max);
+            }
+
+            ViewBag.Max = _max;
+            return View(res);
+
+        }
+
+
 
         public async Task<IActionResult> ProfitCalculation()
         {
@@ -245,7 +281,7 @@ namespace WebService.Controllers
                 recordsTotal = ls.Count();
 
                 //Paging   
-                var data = ls.Skip(skip).Take(pageSize).ToList();
+                var data = ls.ToList();
                 logger.LogInformation($"Data: {JsonConvert.SerializeObject(data)}");
                 //Returning Json Data  
                 return Json(new { draw = draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = data });
@@ -461,7 +497,7 @@ namespace WebService.Controllers
                 //total number of rows count   
                 recordsTotal = productData.Count();
                 //Paging   
-                var data = productData.Skip(skip).Take(pageSize).ToList();
+                var data = productData.ToList();
                 logger.LogInformation($"Data: {JsonConvert.SerializeObject(data)}");
                 //Returning Json Data  
                 return Json(new { draw = draw, recordsFiltered = recordsTotal, recordsTotal = recordsTotal, data = data });

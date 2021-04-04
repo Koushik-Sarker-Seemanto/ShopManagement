@@ -64,6 +64,16 @@ namespace Services
 
             return null;
         }
+	private async Task AddCustomer(Customer customerData)
+        {
+                var phone = customerData.CustomerPhone;
+                var customer = await _repository.GetItemAsync<Customer>(d => d.CustomerPhone == phone);
+                if (customer == null)
+                {
+                    customerData.Id = Guid.NewGuid().ToString();
+                    await _repository.SaveAsync<Customer>(customerData);
+                }
+        }
 
         public async Task<ProductSellViewModel> GetProductNonBar(string name, string quantity)
         {
@@ -192,6 +202,10 @@ namespace Services
                         TotalPrice = model.TotalPrice,
                     };
                     await _repository.SaveAsync<Order>(order);
+		    if (!String.IsNullOrEmpty(model.Name) && !String.IsNullOrEmpty(model.Phone))
+                    {
+                        await AddCustomer(new Customer(model.Name, model.Phone));
+                    }
                     return order;
                 }
                 return null;
@@ -201,6 +215,11 @@ namespace Services
                 logger.LogError(ex, $"SellProduct Failed: {ex.Message}");
                 return null;
             }
+        }
+	public async Task<Customer> GetCustomerByPhone(string phone)
+        {
+            var customer = await _repository.GetItemAsync<Customer>(d => d.CustomerPhone == phone);
+            return customer;
         }
 
         public async Task<ReturnProduct> ReturnProduct(ReturnViewModel model)

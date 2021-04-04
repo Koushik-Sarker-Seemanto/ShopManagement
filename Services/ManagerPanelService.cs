@@ -82,7 +82,7 @@ namespace Services
                         Id = model.Id,
                         Name = model.Name,
                         StockWarning = model.StockWarning,
-                        Stock = model.StockWarning,
+                        Stock = model.Stock,
                         SellingPrice = model.SellingPrice,
                         BuyingPrice = model.BuyingPrice,
                         Details = model.Details,

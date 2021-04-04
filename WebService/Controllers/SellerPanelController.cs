@@ -240,7 +240,20 @@ namespace WebService.Controllers
             await _adminPanelService.PayDue(orderid, Double.Parse(due));
             return Json(new { status = "Success", orderId = orderid });
         }
+	[HttpGet]
+        public async Task<IActionResult> GetCustomerName(string phone)
+        {
+            if (!string.IsNullOrEmpty(phone) )
+            {
+                var res = await _sellerPanelService.GetCustomerByPhone(phone);
+                if (res != null)
+                {
+                    return Json(new { res = res, status = "Found" });
+                }
+            }
 
+            return Json(new { status = "Not Found" });
+        }
         public IActionResult Dues()
         {
             try

@@ -27,7 +27,7 @@
     $("#orderTable").DataTable({
         "processing": true, // for show progress bar
         "serverSide": true, // for process server side
-        "filter": true, // this is for disable filter (search box)
+        "filter": false, // this is for disable filter (search box)
         "orderMulti": false, // for disable multiple column at once
         "ajax": {
             "url": "/AdminPanel/orders",
@@ -53,7 +53,7 @@
             { "data": "sellerName", "name": "Seller Name", "autoWidth": true },
 
             {
-                "render": function (data, type, full, meta) { return '<a class="btn btn-info" href="OrderDetails?id=' + full.id + '">Order Details</a>'; }
+                "render": function (data, type, full, meta) { return '<a class="btn btn-info" target="_blank" href="OrderDetails?id=' + full.id + '">Order Details</a>'; }
             },
         ]
 

@@ -35,16 +35,17 @@
             </div>
         </div>
         <div class="form-row mt-4">
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label class="mb-1" for="name">Customer Name</label>
-                    <input class="form-control" placeholder="Name" id="name" />
-                </div>
-            </div>
-            <div class="col-md-6">
+        <div class="col-md-6">
                 <div class="form-group">
                     <label class="mb-1" for="phone">Customer Phone</label>
                     <input class="form-control" placeholder="Phone Number" id="phone" />
+                </div>
+                <button class="btn btn-info" id="check">Check</button>
+         </div>   
+	 <div class="col-md-6">
+                <div class="form-group">
+                    <label class="mb-1" for="name">Customer Name</label>
+                    <input class="form-control" placeholder="Name" id="name" />
                 </div>
             </div>
         </div>
@@ -202,6 +203,49 @@
                 });
             }
         });
+    });
+    
+    $("#check").click(function() {
+        var phoneVal = $("#phone").val();
+        console.log("Clicked on Check " + phoneVal);
+        Swal.fire({
+            title: 'Loading',
+            text: 'Please Wait...',
+            showCancelButton: false,
+            showConfirmButton: false
+        });
+        if (phoneVal === "" || phoneVal === null) {
+            alert("Please fill phonenumber Field");
+            
+        }
+
+        $.ajax({
+            type: "GET",
+            url: '@Url.Action("GetCustomerName", "SellerPanel")',
+            contentType: "application/json; charset=utf-8",
+            data: {
+                //Passing Input parameter
+                phone: phoneVal
+                
+            },
+            success: function (response) {
+                swal.close();
+                var json_response = JSON.stringify(response);
+
+                if (response.status === "Not Found") {
+                    alert("Customer Never Buy with This Phonenumber");
+                }
+                else {
+                    $("#name").val(response.res.customerName);
+                    
+                }
+            },
+            error: function (response) {
+                swal.close();
+                alert(response);
+            }
+        });
+
     });
 
     $("#add-non-bar").click(function() {
@@ -451,26 +495,25 @@
         }
         let orderId = $("#showInvoice").attr('name');
 
-        let domStart = `<div id="invoice-POS" style="margin: 0 auto;width: 80mm;background: #FFF;">
+                let domStart = `<div id="invoice-POS" style="margin: 0 auto;width: 80mm;background: #FFF;">
 
     <center id="top" style="border-bottom: 1px solid #EEE;min-height: 100px;">
         <div class="info" style="display: block;margin-left: 0;">
             <h2 style="font-size: 1.5em;">M/S. Shymoli Enterprise</h2>
-            <p style="font-size: 1em;color: #666;line-height: 1.2em;">
-                Address : Narsingdi <br />
-                Phone   : 555-555-5555 <br />
-            </p>
+            <h2 style="font-size: 1em">Address : Narsingdi </h2> 
+            <h2 style="font-size: 1em">Phone   : 01611117874 </h2>
         </div><!--End Info-->
     </center><!--End InvoiceTop-->
 
     <div id="mid" style="border-bottom: 1px solid #EEE;min-height: 80px;">
         <div class="info" style="display: block;margin-left: 0;">
             <h2 style="font-size: 1.5em;">Customer Info</h2>
-            <p style="font-size: 1em;color: #666;line-height: 1.2em;">
-                Order ID : ${orderId}  <br />
-                Name    : ${buyerName}  <br />
-                Phone   : ${buyerPhone}  <br />
-            </p>
+            <h2 style="font-size: 1em;">Order ID : ${orderId} </h2>
+
+            <h2 style="font-size: 1em;">Name : ${buyerName} </h2>
+
+            <h2 style="font-size: 1em;">Phone : ${buyerPhone} </h2>
+            
         </div>
     </div>
     <!-- </div>End Invoice Mid -->
@@ -515,9 +558,9 @@
             let prodQuantity = productList[i].productQuantity;
             
             row = row + `<tr class="service" style="border-bottom: 1px solid #EEE;">
-                <td class="tableitem"><p class="itemtext" style="font-size: 1.2em;color: #666;line-height: 1.2em;">${prodName}</p></td>
-                <td class="tableitem"><p class="itemtext" style="font-size: 1.2em;color: #666;line-height: 1.2em;">${prodQuantity}</p></td>
-                <td class="tableitem"><p class="itemtext" style="font-size: 1.2em;color: #666;line-height: 1.2em;">${prodPrice * prodQuantity}</p></td>
+                <td class="tableitem"><h3  style="font-size: 1.2em;">${prodName}</p></td>
+                <td class="tableitem"><h3  style="font-size: 1.2em;">${prodQuantity}</p></td>
+                <td class="tableitem"><h3  style="font-size: 1.2em;">${prodPrice * prodQuantity}</p></td>
                 </tr>`;
         }
 
@@ -525,6 +568,13 @@
         let totalPrice = getTotalPrice();
         let due = getDue();
         let payment = $('#payment').val();
+	
+	 var fullDate = new Date();
+        //convert month to 2 digits
+        var twoDigitMonth = ((fullDate.getMonth().length+1) === 1)? (fullDate.getMonth()+1) : '0' + (fullDate.getMonth()+1);
+ 
+        var currentDate = fullDate.getDate() + "/" + twoDigitMonth + "/" + fullDate.getFullYear();
+
 
         let domEnd = `<tr class="tabletitle">
                     <td></td>
@@ -552,8 +602,8 @@
         </div><!--End Table-->
 
         <div id="legalcopy" style="margin-top: 5mm;">
-            <p class="legal" style="font-size: 1em;color: #666;line-height: 1.2em;">
-                <strong>Thank you for your business!</strong>             </p>
+            <h2 style="font-size: 1em">
+                <strong>Shopping date ${currentDate}</strong>Â             </h2>
         </div>
 
     </div><!--End InvoiceBot-->
@@ -563,6 +613,7 @@
                         <button class="btn btn-danger" onclick="javascript: newOrder()"> Start New Order </button>
                     </div>
                     `;
+
         let finalDom = domStart + row + domEnd;
         $("#showInvoice").append(finalDom);
     }

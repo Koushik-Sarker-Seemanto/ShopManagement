@@ -10,6 +10,7 @@ namespace Services.Contracts
     public interface IAdminPanelService
     {
         Task<IndexViewModel> GetIndexData();
+	Task<List<OrderViewModel>> GetAllOrderViewModels(FromToDate dateRange);
         Task<EmployeeDetailsViewModel> GetEmployeeDetails(string id);
         public Task<List<Product>> GetAllProducts(string search);
         public IQueryable<OrderTable> GetAllDueOrders();

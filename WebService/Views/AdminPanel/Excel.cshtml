@@ -1,0 +1,59 @@
+@model List<Models.ViewModels.AdminPanel.OrderViewModel>
+@{
+    ViewData["Title"] = "Full Sheet";
+    Layout = "_LayoutAdmin";
+}
+<div style="text-align: center">
+    <h1>Sale Status</h1>
+     <button id="btn" class ="btn btn-info">Download as Excel File</button>
+
+</div>
+<br/>
+<script src="https://cdn.rawgit.com/rainabba/jquery-table2excel/1.1.0/dist/jquery.table2excel.min.js"></script>
+
+<div class="table-responsive">
+    <table class="table table-bordered" id="empTable" width="100%" cellspacing="0">
+        <thead>
+            
+        <tr class="text-center">
+            <th> Sale Date </th>
+            <th>ID</th>
+            <th>Customer Name</th>
+            <th>Phone</th>
+            <th>Seller</th>
+            <th>Total Amount</th>
+            <th>Due</th>
+            @for (int i = 1; i <= ViewBag.Max; i++)
+            {
+                <th>Product @i</th>
+            }
+
+        </tr>
+        </thead>
+        @foreach (var product in @Model)
+        {
+    <tr>
+        <td class="text-center">@product.SoldAt.Date.Day/@product.SoldAt.Date.Month/@product.SoldAt.Date.Year</td>
+        <td class="text-center">@product.Id</td>
+<td class="text-center">@product.CustomerName</td>
+        <td class="text-center">@product.CustomerPhone</td>
+        <td class="text-center">@product.SellerName</td>
+        <td class="text-center">@product.TotalPrice</td>
+        <td class="text-center">@product.DueAmount</td>
+        @foreach (var p in product.Products)
+               {
+                    <td class="text-center"> @p.ProductName </td>
+               }
+    </tr>
+        }
+
+    </table>
+
+	<script>
+    $("#btn").click(function () {
+        $("#empTable").table2excel({
+            filename: "Sale.xls"
+        });
+    });
+</script>
+</div>

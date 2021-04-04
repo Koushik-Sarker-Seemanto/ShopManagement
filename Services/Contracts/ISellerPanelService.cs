@@ -17,5 +17,6 @@ namespace Services.Contracts
         public Task<ReturnProduct> ReturnProduct(ReturnViewModel model);
         public List<IndividualProduct> GetAllProducts();
         public Task<ProductDetails> ProductDetailWithReturn(ProductIdInput product);
+	public Task<Customer> GetCustomerByPhone(string phone);
     }
 }
